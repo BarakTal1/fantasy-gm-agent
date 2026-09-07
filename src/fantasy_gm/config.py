@@ -20,6 +20,10 @@ class Settings(BaseSettings):
 
     anthropic_api_key: str = ""
 
+    # Claude model for the agent. Default is the most capable; override via env
+    # AGENT_MODEL=claude-sonnet-5 for a cheaper/faster option.
+    agent_model: str = "claude-opus-5"
+
 
 @lru_cache
 def get_settings() -> Settings:
