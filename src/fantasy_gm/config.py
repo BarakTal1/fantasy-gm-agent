@@ -1,0 +1,22 @@
+from functools import lru_cache
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    yahoo_client_id: str = ""
+    yahoo_client_secret: str = ""
+    yahoo_redirect_uri: str = "oob"
+    yahoo_league_key: str = ""
+
+    database_url: str = "postgresql://fgm:fgm@localhost:5432/fantasy_gm"
+    test_database_url: str = "postgresql://fgm:fgm@localhost:5432/fantasy_gm_test"
+
+    anthropic_api_key: str = ""
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
