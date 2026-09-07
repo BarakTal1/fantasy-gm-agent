@@ -7,12 +7,15 @@ API key. Chosen over free hidden endpoints (NBA CDN, ESPN) because those return
 Requires in .env: BALLDONTLIE_API_KEY
 """
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 
 import httpx
 
-from fantasy_gm.config import get_settings
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from fantasy_gm.config import get_settings  # noqa: E402
 
 URL = "https://api.balldontlie.io/v1/games"
 s = get_settings()

@@ -11,13 +11,16 @@ Requires in .env: YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET,
                    YAHOO_REDIRECT_URI=https://localhost:8000/callback
 """
 import json
+import sys
 import webbrowser
 from pathlib import Path
 from urllib.parse import urlencode
 
 import httpx
 
-from fantasy_gm.config import get_settings
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from fantasy_gm.config import get_settings  # noqa: E402
 
 AUTH = "https://api.login.yahoo.com/oauth2/request_auth"
 TOKEN = "https://api.login.yahoo.com/oauth2/get_token"
