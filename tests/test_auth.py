@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import httpx
 
@@ -17,13 +17,13 @@ def _save(access, refresh, expires_at):
 
 
 def test_returns_valid_token_without_refresh(db):
-    future = datetime.now(timezone.utc) + timedelta(minutes=30)
+    future = datetime.now(UTC) + timedelta(minutes=30)
     _save("good", "r", future)
     assert auth.get_access_token() == "good"
 
 
 def test_refreshes_when_expired(db, monkeypatch):
-    past = datetime.now(timezone.utc) - timedelta(minutes=1)
+    past = datetime.now(UTC) - timedelta(minutes=1)
     _save("stale", "r-token", past)
 
     def fake_post(url, data=None, **kw):

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import httpx
 
@@ -31,7 +31,7 @@ def _refresh(refresh_token: str) -> str:
     if resp.status_code >= 400:
         resp.raise_for_status()
     body = resp.json()
-    expires_at = datetime.now(timezone.utc) + timedelta(seconds=body["expires_in"])
+    expires_at = datetime.now(UTC) + timedelta(seconds=body["expires_in"])
     new_refresh = body.get("refresh_token", refresh_token)
     _save(body["access_token"], new_refresh, expires_at)
     return body["access_token"]
@@ -42,6 +42,6 @@ def get_access_token() -> str:
         "SELECT access_token, refresh_token, expires_at FROM oauth_tokens WHERE id=1")
     if row is None:
         raise RuntimeError("No Yahoo tokens stored. Run scripts/spike_oauth.py first.")
-    if row["expires_at"] - _SKEW > datetime.now(timezone.utc):
+    if row["expires_at"] - _SKEW > datetime.now(UTC):
         return row["access_token"]
     return _refresh(row["refresh_token"])
