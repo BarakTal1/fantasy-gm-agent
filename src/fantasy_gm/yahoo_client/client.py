@@ -8,7 +8,7 @@ from typing import Any
 
 import httpx
 
-from fantasy_gm.schemas import LeagueSettings, Player
+from fantasy_gm.schemas import LeagueSettings, Player, Team
 from fantasy_gm.yahoo_client.auth import get_access_token
 
 API = "https://fantasysports.yahooapis.com/fantasy/v2"
@@ -35,23 +35,44 @@ def parse_league_settings(raw: dict[str, Any]) -> LeagueSettings:
     return LeagueSettings(league_key=league_key, format=fmt, categories=categories)
 
 
+def _parse_player(pdata: list) -> Player:
+    meta = pdata[0]
+    stats = pdata[1].get("player_stats", {}).get("stats", [])
+    name = _meta(meta, "name")
+    return Player(
+        player_id=_meta(meta, "player_id"),
+        name=name["full"] if isinstance(name, dict) else name,
+        nba_team=_meta(meta, "editorial_team_abbr"),
+        positions=_positions(meta),
+        stats={s["stat"]["stat_id"]: float(s["stat"]["value"] or 0) for s in stats},
+    )
+
+
 def parse_free_agents(raw: dict[str, Any]) -> list[Player]:
     players_node = raw["fantasy_content"]["league"][1]["players"]
-    out: list[Player] = []
-    for key, node in players_node.items():
+    return [
+        _parse_player(node["player"])
+        for key, node in players_node.items() if key != "count"
+    ]
+
+
+def parse_teams_with_rosters(raw: dict[str, Any]) -> list[Team]:
+    teams_node = raw["fantasy_content"]["league"][1]["teams"]
+    out: list[Team] = []
+    for key, node in teams_node.items():
         if key == "count":
             continue
-        pdata = node["player"]
-        meta = pdata[0]
-        stats = pdata[1].get("player_stats", {}).get("stats", [])
-        out.append(Player(
-            player_id=_meta(meta, "player_id"),
-            name=_meta(meta, "name")["full"] if isinstance(_meta(meta, "name"), dict)
-                 else _meta(meta, "name"),
-            nba_team=_meta(meta, "editorial_team_abbr"),
-            positions=_positions(meta),
-            stats={s["stat"]["stat_id"]: float(s["stat"]["value"] or 0)
-                   for s in stats},
+        tdata = node["team"]
+        meta = tdata[0]
+        players_node = tdata[1]["roster"]["0"]["players"]
+        players = [
+            _parse_player(p["player"])
+            for k, p in players_node.items() if k != "count"
+        ]
+        out.append(Team(
+            team_key=_meta(meta, "team_key"),
+            name=_meta(meta, "name"),
+            players=players,
         ))
     return out
 
@@ -77,3 +98,19 @@ def fetch_league_settings(league_key: str) -> LeagueSettings:
 
 def fetch_free_agents(league_key: str) -> list[Player]:
     return parse_free_agents(_get(f"league/{league_key}/players;status=FA;out=stats"))
+
+
+def _wrap_team_as_league(raw: dict[str, Any]) -> dict[str, Any]:
+    # TODO: validate against real Yahoo response on approval — the single-team
+    # endpoint shape may differ from the league/teams shape assumed here.
+    return raw
+
+
+def fetch_my_team(league_key: str, team_id: str) -> Team:
+    raw = _get(f"team/{league_key}.t.{team_id}/roster/players/stats")
+    # team endpoint nests differently; validate/adjust against real data on approval
+    return parse_teams_with_rosters(_wrap_team_as_league(raw))[0]
+
+
+def fetch_all_teams(league_key: str) -> list[Team]:
+    return parse_teams_with_rosters(_get(f"league/{league_key}/teams;out=roster,stats"))
