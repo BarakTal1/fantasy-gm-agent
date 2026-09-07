@@ -91,12 +91,25 @@ def _positions(meta_list: list[dict]) -> list[str]:
     return []
 
 
-# Live fetch wrappers (used by sync/tools; not unit-tested against the network)
+# Live fetch wrappers (used by sync/tools; not unit-tested against the network).
+# In demo mode they read local fixtures instead of calling the (approval-gated)
+# Yahoo API — the bridge until real access is granted.
+def _demo_mode() -> bool:
+    from fantasy_gm.config import get_settings
+    return get_settings().demo_mode
+
+
 def fetch_league_settings(league_key: str) -> LeagueSettings:
+    if _demo_mode():
+        from fantasy_gm import demo
+        return demo.demo_league_settings()
     return parse_league_settings(_get(f"league/{league_key}/settings"))
 
 
 def fetch_free_agents(league_key: str) -> list[Player]:
+    if _demo_mode():
+        from fantasy_gm import demo
+        return demo.demo_free_agents()
     return parse_free_agents(_get(f"league/{league_key}/players;status=FA;out=stats"))
 
 
@@ -113,4 +126,7 @@ def fetch_my_team(league_key: str, team_id: str) -> Team:
 
 
 def fetch_all_teams(league_key: str) -> list[Team]:
+    if _demo_mode():
+        from fantasy_gm import demo
+        return demo.demo_teams()
     return parse_teams_with_rosters(_get(f"league/{league_key}/teams;out=roster,stats"))

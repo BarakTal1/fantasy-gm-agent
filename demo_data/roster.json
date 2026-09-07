@@ -1,0 +1,60 @@
+{
+  "fantasy_content": {
+    "league": [
+      {"league_key": "428.l.123456"},
+      {
+        "teams": {
+          "0": {
+            "team": [
+              [
+                {"team_key": "428.l.123456.t.1"},
+                {"team_id": "1"},
+                {"name": "My Squad"}
+              ],
+              {
+                "roster": {
+                  "0": {
+                    "players": {
+                      "0": {
+                        "player": [
+                          [
+                            {"player_key": "428.p.4001"},
+                            {"player_id": "4001"},
+                            {"name": {"full": "Tyrese Haliburton"}},
+                            {"editorial_team_abbr": "IND"},
+                            {"eligible_positions": [{"position": "PG"}]}
+                          ],
+                          {"player_stats": {"stats": [
+                            {"stat": {"stat_id": "12", "value": "18.6"}},
+                            {"stat": {"stat_id": "16", "value": "9.2"}}
+                          ]}}
+                        ]
+                      },
+                      "1": {
+                        "player": [
+                          [
+                            {"player_key": "428.p.4002"},
+                            {"player_id": "4002"},
+                            {"name": {"full": "Myles Turner"}},
+                            {"editorial_team_abbr": "IND"},
+                            {"eligible_positions": [{"position": "C"}]}
+                          ],
+                          {"player_stats": {"stats": [
+                            {"stat": {"stat_id": "12", "value": "15.9"}},
+                            {"stat": {"stat_id": "18", "value": "1.9"}}
+                          ]}}
+                        ]
+                      },
+                      "count": 2
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "count": 1
+        }
+      }
+    ]
+  }
+}

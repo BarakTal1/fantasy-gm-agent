@@ -1,0 +1,96 @@
+{
+  "fantasy_content": {
+    "league": [
+      {"league_key": "428.l.123456"},
+      {
+        "players": {
+          "0": {
+            "player": [
+              [
+                {"player_key": "428.p.6021"},
+                {"player_id": "6021"},
+                {"name": {"full": "Josh Hart", "first": "Josh", "last": "Hart"}},
+                {"editorial_team_abbr": "NYK"},
+                {"display_position": "SG,SF"},
+                {"eligible_positions": [{"position": "SG"}, {"position": "SF"}]}
+              ],
+              {
+                "player_stats": {
+                  "0": {"coverage_type": "season", "season": "2025"},
+                  "stats": [
+                    {"stat": {"stat_id": "5", "value": "0.512"}},
+                    {"stat": {"stat_id": "8", "value": "0.780"}},
+                    {"stat": {"stat_id": "10", "value": "1.4"}},
+                    {"stat": {"stat_id": "12", "value": "13.6"}},
+                    {"stat": {"stat_id": "15", "value": "9.4"}},
+                    {"stat": {"stat_id": "16", "value": "5.2"}},
+                    {"stat": {"stat_id": "17", "value": "1.5"}},
+                    {"stat": {"stat_id": "18", "value": "0.4"}},
+                    {"stat": {"stat_id": "19", "value": "1.6"}}
+                  ]
+                }
+              }
+            ]
+          },
+          "1": {
+            "player": [
+              [
+                {"player_key": "428.p.5471"},
+                {"player_id": "5471"},
+                {"name": {"full": "Alex Caruso", "first": "Alex", "last": "Caruso"}},
+                {"editorial_team_abbr": "OKC"},
+                {"display_position": "PG,SG"},
+                {"eligible_positions": [{"position": "PG"}, {"position": "SG"}, {"position": "G"}]}
+              ],
+              {
+                "player_stats": {
+                  "0": {"coverage_type": "season", "season": "2025"},
+                  "stats": [
+                    {"stat": {"stat_id": "5", "value": "0.447"}},
+                    {"stat": {"stat_id": "8", "value": "0.808"}},
+                    {"stat": {"stat_id": "10", "value": "1.7"}},
+                    {"stat": {"stat_id": "12", "value": "7.1"}},
+                    {"stat": {"stat_id": "15", "value": "3.4"}},
+                    {"stat": {"stat_id": "16", "value": "2.9"}},
+                    {"stat": {"stat_id": "17", "value": "1.8"}},
+                    {"stat": {"stat_id": "18", "value": "0.7"}},
+                    {"stat": {"stat_id": "19", "value": "0.9"}}
+                  ]
+                }
+              }
+            ]
+          },
+          "2": {
+            "player": [
+              [
+                {"player_key": "428.p.6567"},
+                {"player_id": "6567"},
+                {"name": {"full": "Jaden McDaniels", "first": "Jaden", "last": "McDaniels"}},
+                {"editorial_team_abbr": "MIN"},
+                {"display_position": "SF,PF"},
+                {"eligible_positions": [{"position": "SF"}, {"position": "PF"}, {"position": "F"}]}
+              ],
+              {
+                "player_stats": {
+                  "0": {"coverage_type": "season", "season": "2025"},
+                  "stats": [
+                    {"stat": {"stat_id": "5", "value": "0.468"}},
+                    {"stat": {"stat_id": "8", "value": "0.712"}},
+                    {"stat": {"stat_id": "10", "value": "1.1"}},
+                    {"stat": {"stat_id": "12", "value": "10.9"}},
+                    {"stat": {"stat_id": "15", "value": "3.9"}},
+                    {"stat": {"stat_id": "16", "value": "1.6"}},
+                    {"stat": {"stat_id": "17", "value": "1.2"}},
+                    {"stat": {"stat_id": "18", "value": "0.9"}},
+                    {"stat": {"stat_id": "19", "value": "1.0"}}
+                  ]
+                }
+              }
+            ]
+          },
+          "count": 3
+        }
+      }
+    ]
+  }
+}

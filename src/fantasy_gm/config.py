@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     # hidden endpoints because those block datacenter IPs (breaks cloud sync).
     balldontlie_api_key: str = ""
 
+    # When true, the Yahoo-backed fetchers read local demo fixtures instead of
+    # calling the (approval-gated) Yahoo API. Bridge until real access is granted.
+    demo_mode: bool = False
+
     anthropic_api_key: str = ""
 
     # Claude model for the agent. Default is the most capable; override via env

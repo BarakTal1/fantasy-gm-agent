@@ -1,8 +1,11 @@
 import sys
+from pathlib import Path
 
 import psycopg
 
-from fantasy_gm.config import get_settings
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from fantasy_gm.config import get_settings  # noqa: E402
 
 
 def run(database_url: str) -> None:
