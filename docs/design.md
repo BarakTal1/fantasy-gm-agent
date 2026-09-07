@@ -110,7 +110,11 @@ The LLM chooses the tool sequence; the same loop serves every question type (tra
 
 ### Key domain rules
 - **League config: read once, cache, refresh on demand.** Bootstrapped once into `league_config`, seeded into every conversation. User can say "refresh my league settings" → single `refresh_league_settings()` run overwrites the cache. The agent auto-adapts reasoning to 9-cat vs points because the format is in its context.
-- **Games-played value model (core edge).** `expected_value ≈ per_game_form × games_remaining_this_week`. A player with 4 games this week is worth ~2× the same player with 2 games. Compounds with trends: recent form × games = expected contribution. This is the analytical heart and a defensible interview talking point.
+- **Two valuation modes — the agent must pick the right lens per question.**
+  - **Short-term value** (waiver add/drop, streaming, start/sit): games-this-week aware.
+    `short_term_value ≈ per_game_form × games_remaining_this_week`. A player with 4 games this week is worth ~2× the same player with 2 games. Compounds with recent trends (`get_trends` short window, e.g. 14d). This is the streaming edge.
+  - **Long-term value** (evaluating trades for **core players**): a single week's schedule is *noise* and must be ignored. Uses rest-of-season / season-long production, sustained trends (long `get_trends` window / season averages), consistency, and role/usage — not weekly games count.
+  - **Routing rule:** waiver/streaming/start-sit questions → short-term model; trade evaluation of core players → long-term model. The agent selects the lens based on question type and states which lens it used. This routing is itself a defensible interview talking point ("I don't let a favorable weekly schedule distort a season-long trade decision").
 
 ### Streaming
 The backend streams both **answer tokens** (word-by-word) and **tool events** (status chips). This is most of what makes the UI feel impressive and maps 1:1 to the LangSmith trace.
@@ -180,7 +184,7 @@ Two complementary layers, deliberately deduped:
 ### 9a. Pre-ship quality gate (LangSmith, minimal)
 A small saved dataset (~15–25 hero questions) + two **cheap rule-based scorers** run on every change:
 - **Grounding** — every cited player/stat came from a tool result (catches hallucination).
-- **Tool trajectory** — the right tools fired (e.g. "who to pick up" must call `get_weekly_schedule`).
+- **Tool trajectory** — the right tools fired *and the right valuation lens was used*: "who to pick up" must call `get_weekly_schedule` (short-term); a core-player trade eval must use long-term trends/season data and must **not** hinge on this week's schedule.
 
 Interview line: *"I treat prompt changes like code changes — they don't ship unless the eval score holds."*
 
@@ -196,7 +200,7 @@ Fantasy Assistant ──traces──▶ LangSmith ──ingested──▶ Intent
        └──────── roadmap: data-driven capability gaps ◀─────┘
 ```
 
-**Populating it without real users:** generate a **simulated usage corpus** (~50–100 realistic fantasy questions), run them through the live agent → produces real traces → feed to Intent-Analysis → populated dashboard for the demo. Stated plainly as a simulated corpus.
+**Populating it with real usage:** no simulated corpus. The loop is wired at ship time and accumulates **genuine traces** from real use — the author (an active manager) using it through the season, plus optional league-mates. Trade-off accepted: the dashboard starts sparse and grows over weeks, so the closed loop is presented as *"instrumented and accumulating real usage"* and the rich gap-analysis screenshots come once enough real conversations exist. This is more credible than a seeded corpus, at the cost of not being demo-ready on day one.
 
 ### 9c. Traditional testing (focused, not coverage-chasing)
 - Integration layer: unit tests with **recorded** Yahoo responses (replayed, never hit Yahoo); test parsing + token-refresh path.
@@ -218,7 +222,7 @@ Fantasy Assistant ──traces──▶ LangSmith ──ingested──▶ Intent
 1. Live clickable demo (public URL).
 2. Client-grade README: Architecture (with diagram) · Security & Auth · Deployment Guide · Trade-offs.
 3. LangSmith traces + eval scores (screenshots / description).
-4. Intent-Analysis dashboard showing the closed loop and a data-driven roadmap.
+4. Intent-Analysis loop wired to live traces (dashboard + data-driven roadmap populated as real usage accumulates through the season).
 5. Short demo GIF/Loom.
 
 ---
@@ -247,7 +251,7 @@ The client-grade README grows throughout — each section written as its piece i
 **Week 3 (half) — UI, deploy, closed loop, polish**
 - React chat: streaming answers, live tool-status chips, clean stat tables.
 - Deploy: Vercel + Railway/Fly; live URL.
-- Wire Intent-Analysis: define skill catalog from toolbox, generate question corpus, ingest traces, screenshot dashboard.
+- Wire Intent-Analysis: define skill catalog from toolbox, connect ingestion to the live LangSmith project. Real usage accumulates from here; capture dashboard screenshots once enough real conversations exist (may be post-sprint).
 - README finish: Deployment Guide + diagram + demo GIF/Loom.
 - Ship.
 
