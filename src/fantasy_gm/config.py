@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql://fgm:fgm@localhost:5432/fantasy_gm"
     test_database_url: str = "postgresql://fgm:fgm@localhost:5432/fantasy_gm_test"
 
+    # NBA schedule source (see docs/design.md §14). Keyed API chosen over free
+    # hidden endpoints because those block datacenter IPs (breaks cloud sync).
+    balldontlie_api_key: str = ""
+
     anthropic_api_key: str = ""
 
 

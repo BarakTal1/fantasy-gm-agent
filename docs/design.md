@@ -269,6 +269,6 @@ The client-grade README grows throughout — each section written as its piece i
 - **Deploy:** Vercel + Railway/Fly.io; local dev via Docker Compose.
 
 ## 14. Open questions / to confirm during build
-- Exact weekly-schedule data source (settled by the Week-0 spike).
+- **Weekly-schedule data source: RESOLVED — balldontlie API (https://www.balldontlie.io/) with a free API key.** Chosen over free hidden endpoints (NBA CDN, ESPN) because those return HTTP 403 to datacenter IPs, which would break the nightly sync once it runs on the cloud host (Railway/Fly). Key stored as `BALLDONTLIE_API_KEY` env var. To be confirmed live once the key is in `.env`.
 - Anthropic model choice for the agent (default to the latest capable Claude; confirm at build time).
 - Whether the pre-ship eval "recommendation quality" is fully delegated to Intent-Analysis satisfaction scoring or a lightweight judge is also kept in the gate.
