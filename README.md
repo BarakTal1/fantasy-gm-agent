@@ -4,7 +4,7 @@ A conversational AI assistant for NBA fantasy basketball. Ask it things like *"w
 
 Built as a portfolio project demonstrating the full Forward Deployed Engineer lifecycle: **messy real-world integration → agentic AI → productionization → observability → a data-driven improvement loop.**
 
-> **Status:** Phase 1 (foundation & data layer) complete. Yahoo Fantasy API access is pending Yahoo's manual approval; the integration is built and tested against spec-accurate fixtures and will swap to live data on approval. Agent, API, UI, and deployment are Phases 2–3. See [docs/design.md](docs/design.md) and [docs/plans/](docs/plans/).
+> **Status:** Phases 1 & 2 complete — the data layer, the LangGraph/Claude agent, the streaming FastAPI API, guardrails, and the eval harness are built and tested (fake-model tests need no API key). Two live-data steps are pending external gates: Yahoo Fantasy API access (awaiting Yahoo's manual approval — integration is built and tested against spec-accurate fixtures, ready to swap on approval) and an `ANTHROPIC_API_KEY` for real model calls. React UI, deployment, and the Intent-Analysis usage loop are Phase 3. See [docs/design.md](docs/design.md) and [docs/plans/](docs/plans/).
 
 ## Architecture (target)
 
@@ -19,14 +19,21 @@ React chat UI  →  FastAPI (streaming)  →  LangGraph agent ── toolbox ─
 
 The design deliberately isolates all Yahoo messiness (OAuth token refresh, legacy JSON parsing, rate limits) behind one `yahoo_client` module, so the rest of the system only ever sees clean typed objects.
 
-## What's built (Phase 1)
+## What's built
 
+**Phase 1 — data & integration layer**
 - **`yahoo_client/`** — OAuth2 with transparent token refresh, typed parsers over Yahoo's nested JSON, short-TTL cache, error classification.
 - **`db.py` + `db/schema.sql`** — Postgres store: league config, daily player stat snapshots, weekly schedule, tokens.
 - **`value.py`** — two valuation modes: short-term (games-this-week-aware, for waivers/streaming) and long-term (season value, for core-player trades).
 - **`sync.py`** — nightly sync of stats + NBA weekly schedule into Postgres.
-- **`tools.py`** — the agent's toolbox: league settings (read-once/refresh), trends, weekly schedule.
+- **`tools.py`** — the toolbox: league settings (read-once/refresh), trends, weekly schedule, roster/team/free agents.
 - Weekly NBA games-played sourced from the [balldontlie API](https://www.balldontlie.io/) (keyed) — chosen over free hidden endpoints because those block datacenter IPs, which would break the cloud-hosted nightly sync.
+
+**Phase 2 — agent, API & evals**
+- **`agent.py` + `agent_tools.py` + `prompts.py`** — a LangGraph/Claude agent that plans tool calls and reasons, with the league format seeded into its system prompt. The toolbox is exposed as LangChain tools.
+- **`api.py`** — FastAPI `POST /chat` streaming tool + answer events over SSE, `GET /health`.
+- **`guardrails.py`** — grounding check that flags any player named in an answer that the tools didn't return.
+- **`evals/`** — grounding + tool-trajectory scorers and a LangSmith dataset harness (the pre-ship quality gate).
 
 ## Security & Auth
 
