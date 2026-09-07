@@ -46,8 +46,10 @@ def chat(req: ChatRequest) -> StreamingResponse:
                         my_team_key=MY_TEAM_KEY, model=_make_model())
 
     def gen():
+        config = {"configurable": {"thread_id": req.conversation_id}}
         for chunk in agent.stream(
             {"messages": [HumanMessage(req.message)]},
+            config=config,
             stream_mode="updates",
         ):
             for _node, update in chunk.items():
