@@ -2,7 +2,7 @@ import json
 from datetime import date, timedelta
 
 from fantasy_gm.db import execute, fetch_all, fetch_one
-from fantasy_gm.schemas import LeagueSettings
+from fantasy_gm.schemas import LeagueSettings, Player, Team
 from fantasy_gm.yahoo_client import client
 
 
@@ -62,3 +62,22 @@ def get_weekly_schedule(week: int) -> dict[str, dict]:
         "WHERE week=%s", (week,))
     return {r["nba_team"]: {"games_total": r["games_total"],
                             "games_remaining": r["games_remaining"]} for r in rows}
+
+
+def get_free_agents(league_key: str) -> list[Player]:
+    return client.fetch_free_agents(league_key)
+
+
+def get_all_teams(league_key: str) -> list[Team]:
+    return client.fetch_all_teams(league_key)
+
+
+def get_my_roster(league_key: str, my_team_key: str) -> Team:
+    for t in client.fetch_all_teams(league_key):
+        if t.team_key == my_team_key:
+            return t
+    raise ValueError(f"team {my_team_key} not found in league {league_key}")
+
+
+def get_team(league_key: str, team_key: str) -> Team:
+    return get_my_roster(league_key, team_key)  # same lookup, any team

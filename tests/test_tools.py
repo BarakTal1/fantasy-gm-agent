@@ -33,3 +33,25 @@ def test_get_weekly_schedule_reads_table(db):
             ("LAL", 1, 4, 3, date(2026, 1, 6)))
     sched = tools.get_weekly_schedule(week=1)
     assert sched["LAL"]["games_remaining"] == 3
+
+
+def test_get_free_agents_delegates_to_client(monkeypatch):
+    from fantasy_gm import tools
+    from fantasy_gm.schemas import Player
+    sentinel = [Player(player_id="1", name="X", nba_team="LAL")]
+    monkeypatch.setattr(tools.client, "fetch_free_agents", lambda k: sentinel)
+    assert tools.get_free_agents("428.l.1") == sentinel
+
+
+def test_get_my_roster_filters_team(monkeypatch):
+    from fantasy_gm import tools
+    from fantasy_gm.schemas import Player, Team
+    teams = [
+        Team(team_key="428.l.1.t.1", name="Mine",
+             players=[Player(player_id="1", name="A", nba_team="IND")]),
+        Team(team_key="428.l.1.t.2", name="Theirs",
+             players=[Player(player_id="2", name="B", nba_team="BOS")]),
+    ]
+    monkeypatch.setattr(tools.client, "fetch_all_teams", lambda k: teams)
+    mine = tools.get_my_roster("428.l.1", "428.l.1.t.1")
+    assert mine.name == "Mine"
