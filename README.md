@@ -45,6 +45,27 @@ uv run python scripts/run_migrations.py   # create tables
 uv run pytest -v          # run the test suite
 ```
 
+## Run the agent
+
+Requires a running Postgres (`docker compose up -d db`) and an `ANTHROPIC_API_KEY` in `.env` for real model calls (tests use a fake model and need neither).
+
+```bash
+uv run python scripts/run_migrations.py       # create/upgrade schema
+uv run python scripts/setup_checkpointer.py   # create LangGraph checkpoint tables (once)
+uv run uvicorn fantasy_gm.api:app --reload    # POST /chat (SSE), GET /health
+```
+
+`POST /chat` takes `{"message": str, "conversation_id": str}` and streams Server-Sent Events: `tool` events as the agent calls toolbox functions, and a final `final` event with the answer text. `conversation_id` is threaded through as the LangGraph `thread_id`, so conversation history persists in Postgres across requests once the agent is built with a `PostgresSaver` checkpointer.
+
+## Trade-offs
+
+- **Read-only agent.** The LLM only ever calls read tools (roster, trends, schedule, free agents) and never has a path to submit a roster move or trade to Yahoo. It recommends; a human executes. This removes an entire class of "the agent did something irreversible" risk at the cost of one extra manual step per action.
+- **Grounding guardrail + tool-trajectory evals as the pre-ship quality gate.** Every prompt or tool change is checked against LangSmith-scored evals (does the answer only mention players the tools actually returned; did the agent call the tools a reasonable trajectory would call) before it ships — a data-driven gate instead of "it looked fine in a manual test."
+- **`claude-opus-5` by default, swappable via `AGENT_MODEL=claude-sonnet-5`.** Opus gives better reasoning over noisy fantasy trade-offs out of the box; Sonnet is a one-env-var downgrade for cost-sensitive deployments once the eval suite shows it holds up.
+- **Keyed schedule API (balldontlie) over free hidden endpoints.** Free/unofficial NBA schedule endpoints tend to block datacenter IPs, which would silently break the nightly cloud sync. A keyed API costs a signup but keeps the sync reliable.
+- **Postgres cache + nightly sync instead of calling Yahoo live per request.** League settings, stats, and schedule are cached and refreshed on a schedule so the agent never hammers Yahoo's rate-limited API mid-conversation; `get_league_settings` is read-once with an explicit `refresh_*` escape hatch.
+- **PaaS deploy for now.** The current target is a simple PaaS (Postgres + one app process) to keep Phase 2/3 iteration fast. The same pieces map directly onto AWS for an enterprise deployment: ECS/EKS for the API process, RDS for Postgres, Secrets Manager for `YAHOO_CLIENT_SECRET`/`ANTHROPIC_API_KEY`/DB credentials — swapping infra, not architecture.
+
 ## Project docs
 
 - [docs/design.md](docs/design.md) — full design spec (architecture, data flow, trade-offs).
