@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 import psycopg
 import pytest
 
@@ -20,3 +23,11 @@ def db(monkeypatch):
             "weekly_schedule, oauth_tokens"
         )
         conn.commit()
+
+
+@pytest.fixture
+def fixture():
+    def _load(name: str) -> dict:
+        return json.loads((Path("tests/fixtures") / name).read_text())
+
+    return _load
