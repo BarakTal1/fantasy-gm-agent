@@ -21,6 +21,24 @@ def test_dashboard_endpoint_returns_all_sections(monkeypatch):
     assert body["category_profile"]["PTS"]["you"] == 20
 
 
+def test_trade_analyze_returns_deltas_and_verdict(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.schemas import Player
+    pool = {"1": Player(player_id="1", name="Mine", nba_team="LAL", stats={"AST": 8}),
+            "2": Player(player_id="2", name="Theirs", nba_team="BOS", stats={"AST": 2})}
+    monkeypatch.setattr(api, "_league_cats", lambda: ["AST"])
+    monkeypatch.setattr(api, "_players_by_id", lambda ids: {i: pool[i] for i in ids})
+    monkeypatch.setattr(api, "_verdict",
+                        lambda delta, summary, give, get: "Decline — you lose assists.")
+    from fastapi.testclient import TestClient
+    r = TestClient(api.app).post("/trade/analyze",
+                                 json={"give": ["1"], "get": ["2"]})
+    body = r.json()
+    assert body["delta"]["AST"] == -6.0
+    assert "assists" in body["verdict"].lower()
+    assert body["summary"]["worsened"] == ["AST"]
+
+
 def test_chat_streams_final_answer(monkeypatch):
     from fantasy_gm import api
     from fantasy_gm.schemas import LeagueSettings

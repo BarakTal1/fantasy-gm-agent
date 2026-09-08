@@ -11,7 +11,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
 from pydantic import BaseModel
 
-from fantasy_gm import analytics
+from fantasy_gm import analytics, trade
 from fantasy_gm.agent import build_agent
 from fantasy_gm.config import get_settings
 from fantasy_gm.schemas import LeagueSettings
@@ -66,6 +66,11 @@ class ChatRequest(BaseModel):
     conversation_id: str = "default"
 
 
+class TradeRequest(BaseModel):
+    give: list[str]
+    get: list[str]
+
+
 def _load_league() -> LeagueSettings:
     return get_league_settings(LEAGUE_KEY)
 
@@ -91,6 +96,27 @@ def _trends_for(ids):
 
 def _week_games():
     return {t: v["games_remaining"] for t, v in get_weekly_schedule(MY_WEEK).items()}
+
+
+def _players_by_id(ids: list[str]) -> dict:
+    idx = {p.player_id: p for t in _all_teams() for p in t.players}
+    idx.update({p.player_id: p for p in _free_agents()})
+    return {i: idx[i] for i in ids if i in idx}
+
+
+def _verdict(delta, summary, give, get) -> str:
+    """Single focused Claude call grounded in the computed deltas."""
+    model = _make_model()
+    prompt = (
+        "You are an honest NBA fantasy trade analyst for a category league.\n"
+        f"Net category change to the user's team (positive = more of that cat; "
+        f"for TO, negative is better): {delta}.\n"
+        f"Categories improved: {summary['improved']}; worsened: {summary['worsened']}.\n"
+        f"Giving away: {[p.name for p in give]}; receiving: {[p.name for p in get]}.\n"
+        "Give a 3-4 sentence honest verdict and end with exactly one of: "
+        "ACCEPT, DECLINE, or COUNTER."
+    )
+    return _text(model.invoke(prompt).content)
 
 
 def _make_model():
@@ -136,6 +162,21 @@ def dashboard() -> dict:
             mine.players + fas, {**roster_trends, **fa_trends}, cats)[:12],
         "schedule": games,
     }
+
+
+@app.post("/trade/analyze")
+def trade_analyze(req: TradeRequest) -> dict:
+    cats = _league_cats()
+    byid = _players_by_id(req.give + req.get)
+    give = [byid[i] for i in req.give if i in byid]
+    get = [byid[i] for i in req.get if i in byid]
+    delta = trade.category_delta(give, get, cats)
+    summary = trade.summarize(delta)
+    verdict = _verdict(delta, summary, give, get)
+    rec = ("ACCEPT" if "ACCEPT" in verdict else
+           "COUNTER" if "COUNTER" in verdict else "DECLINE")
+    return {"delta": delta, "summary": summary, "verdict": verdict,
+            "recommendation": rec}
 
 
 @app.post("/chat")
