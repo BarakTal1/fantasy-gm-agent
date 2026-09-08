@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --font: 'Inter', system-ui, sans-serif;
+  --primary: #2563EB; --primary-hover: #1D4ED8; --on-primary: #FFFFFF;
+  --indigo: #6366F1; --accent: #059669;
+  --bg: #FFFFFF; --surface: #F1F5FD; --surface-2: #FFFFFF;
+  --text: #0F172A; --muted: #64748B; --border: #E4ECFC;
+  --danger: #DC2626; --ring: #2563EB;
+  --radius: 14px; --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(15,23,42,.06), 0 4px 16px rgba(15,23,42,.06);
+}
+:root[data-theme="dark"] {
+  --primary: #3B82F6; --primary-hover: #60A5FA; --on-primary: #0B1220;
+  --indigo: #818CF8; --accent: #10B981;
+  --bg: #0B1220; --surface: #111A2E; --surface-2: #0F1729;
+  --text: #E5EDF7; --muted: #94A3B8; --border: #1E293B;
+  --danger: #F87171; --ring: #3B82F6;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 20px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --primary: #3B82F6; --primary-hover: #60A5FA; --on-primary: #0B1220;
+    --indigo: #818CF8; --accent: #10B981;
+    --bg: #0B1220; --surface: #111A2E; --surface-2: #0F1729;
+    --text: #E5EDF7; --muted: #94A3B8; --border: #1E293B;
+    --danger: #F87171; --ring: #3B82F6;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 20px rgba(0,0,0,.35);
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
