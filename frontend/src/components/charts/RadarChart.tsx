@@ -31,7 +31,7 @@ export function RadarChart({ cats, you, league }: {
         <span><i className="sw league" /> League avg</span>
       </div>
       <table className="sr-table">
-        <caption>Category profile — you vs league average</caption>
+        <caption>Per-category totals, you vs the league average</caption>
         <thead><tr><th>Category</th><th>You</th><th>League avg</th></tr></thead>
         <tbody>{cats.map((c, i) =>
           <tr key={c}><td>{c}</td><td>{you[i]}</td><td>{league[i]}</td></tr>)}</tbody>
