@@ -12,8 +12,11 @@ def build_agent(league: LeagueSettings, league_key: str, my_team_key: str,
     """Construct the LangGraph agent. Pass `model` in tests (a fake); in
     production it defaults to ChatAnthropic on the configured Claude model."""
     if model is None:
+        s = get_settings()
+        # Pass the key from our Settings (.env) explicitly — ChatAnthropic only
+        # reads it from the OS env otherwise, which pydantic-settings doesn't set.
         model = ChatAnthropic(
-            model=get_settings().agent_model, max_tokens=4096)
+            model=s.agent_model, api_key=s.anthropic_api_key, max_tokens=4096)
     lc_tools = build_tools(league_key=league_key, my_team_key=my_team_key)
     return create_react_agent(
         model,

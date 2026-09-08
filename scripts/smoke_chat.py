@@ -18,6 +18,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from langchain_core.messages import AIMessage, HumanMessage  # noqa: E402
 
+
+def _text(content) -> str:
+    """Claude Opus 5 returns content as a list of blocks (thinking + text);
+    extract just the human-readable text."""
+    if isinstance(content, str):
+        return content
+    return "\n".join(
+        b["text"] for b in content
+        if isinstance(b, dict) and b.get("type") == "text"
+    )
+
 from fantasy_gm.agent import build_agent  # noqa: E402
 from fantasy_gm.config import get_settings  # noqa: E402
 from fantasy_gm.tools import get_league_settings  # noqa: E402
@@ -51,8 +62,8 @@ def main() -> None:
             for m in (update.get("messages", []) if isinstance(update, dict) else []):
                 for tc in getattr(m, "tool_calls", None) or []:
                     print(f"  🔧 tool call: {tc['name']}({tc.get('args', {})})")
-                if isinstance(m, AIMessage) and m.content:
-                    final = m.content
+                if isinstance(m, AIMessage) and _text(m.content):
+                    final = _text(m.content)
 
     print("-" * 70)
     print("FINAL ANSWER:\n")

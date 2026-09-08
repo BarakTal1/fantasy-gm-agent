@@ -28,7 +28,9 @@ def _load_league() -> LeagueSettings:
 
 
 def _make_model():
-    return ChatAnthropic(model=get_settings().agent_model, max_tokens=4096)
+    s = get_settings()
+    return ChatAnthropic(model=s.agent_model, api_key=s.anthropic_api_key,
+                         max_tokens=4096)
 
 
 def _sse(event: str, data: dict) -> str:
