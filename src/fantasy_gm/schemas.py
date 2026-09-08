@@ -23,7 +23,12 @@ class LeagueSettings(BaseModel):
     format: str                        # "category" | "points"
     categories: list[str] = Field(default_factory=list)
     roster_slots: dict[str, int] = Field(default_factory=dict)
+    point_weights: dict[str, float] = Field(default_factory=dict)  # points leagues only
 
     @property
     def is_category(self) -> bool:
         return self.format == "category"
+
+    @property
+    def is_points(self) -> bool:
+        return self.format == "points"

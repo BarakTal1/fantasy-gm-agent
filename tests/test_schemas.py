@@ -10,3 +10,11 @@ def test_league_settings_is_category():
     s = LeagueSettings(league_key="428.l.1", format="category",
                        categories=["PTS", "AST"], roster_slots={"PG": 1})
     assert s.is_category is True
+
+def test_league_settings_points_format():
+    from fantasy_gm.schemas import LeagueSettings
+    s = LeagueSettings(league_key="k", format="points",
+                       point_weights={"PTS": 1.0, "AST": 1.5})
+    assert s.is_points is True
+    assert s.is_category is False
+    assert s.point_weights["AST"] == 1.5

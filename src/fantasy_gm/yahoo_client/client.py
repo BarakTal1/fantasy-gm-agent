@@ -32,7 +32,16 @@ def parse_league_settings(raw: dict[str, Any]) -> LeagueSettings:
         c["stat"]["display_name"]
         for c in settings.get("stat_categories", {}).get("stats", [])
     ]
-    return LeagueSettings(league_key=league_key, format=fmt, categories=categories)
+    weights = {}
+    if fmt == "points":
+        id_to_name = {str(c["stat"]["stat_id"]): c["stat"]["display_name"]
+                      for c in settings.get("stat_categories", {}).get("stats", [])}
+        for m in settings.get("stat_modifiers", {}).get("stats", []):
+            sid = str(m["stat"]["stat_id"])
+            if sid in id_to_name:
+                weights[id_to_name[sid]] = float(m["stat"]["value"])
+    return LeagueSettings(league_key=league_key, format=fmt, categories=categories,
+                          point_weights=weights)
 
 
 def _parse_player(pdata: list) -> Player:

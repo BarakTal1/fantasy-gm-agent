@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     # When true, the Yahoo-backed fetchers read local demo fixtures instead of
     # calling the (approval-gated) Yahoo API. Bridge until real access is granted.
     demo_mode: bool = False
+    demo_league_format: str = "category"   # "category" | "points"
 
     anthropic_api_key: str = ""
 

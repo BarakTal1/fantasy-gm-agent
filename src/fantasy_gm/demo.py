@@ -10,6 +10,7 @@ Yahoo-shaped league_settings.json fixture.
 import json
 from pathlib import Path
 
+from fantasy_gm.config import get_settings
 from fantasy_gm.schemas import LeagueSettings, Player, Team
 from fantasy_gm.yahoo_client import client
 
@@ -21,7 +22,10 @@ def _load(name: str) -> dict:
 
 
 def demo_league_settings() -> LeagueSettings:
-    return client.parse_league_settings(_load("league_settings.json"))
+    fmt = get_settings().demo_league_format
+    fixture = ("league_settings_points.json" if fmt == "points"
+               else "league_settings.json")
+    return client.parse_league_settings(_load(fixture))
 
 
 def _player(d: dict) -> Player:

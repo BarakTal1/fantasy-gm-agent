@@ -1,0 +1,29 @@
+{
+  "fantasy_content": {
+    "league": [
+      {"league_key": "428.l.222222", "name": "Points League", "scoring_type": "point",
+       "current_week": 15, "season": "2025"},
+      {"settings": [{
+        "scoring_type": "point",
+        "stat_categories": {"stats": [
+          {"stat": {"stat_id": 12, "display_name": "PTS"}},
+          {"stat": {"stat_id": 15, "display_name": "REB"}},
+          {"stat": {"stat_id": 16, "display_name": "AST"}},
+          {"stat": {"stat_id": 10, "display_name": "3PTM"}},
+          {"stat": {"stat_id": 17, "display_name": "ST"}},
+          {"stat": {"stat_id": 18, "display_name": "BLK"}},
+          {"stat": {"stat_id": 19, "display_name": "TO"}}
+        ]},
+        "stat_modifiers": {"stats": [
+          {"stat": {"stat_id": 12, "value": 1.0}},
+          {"stat": {"stat_id": 15, "value": 1.2}},
+          {"stat": {"stat_id": 16, "value": 1.5}},
+          {"stat": {"stat_id": 10, "value": 0.5}},
+          {"stat": {"stat_id": 17, "value": 3.0}},
+          {"stat": {"stat_id": 18, "value": 3.0}},
+          {"stat": {"stat_id": 19, "value": -1.0}}
+        ]}
+      }]}
+    ]
+  }
+}
