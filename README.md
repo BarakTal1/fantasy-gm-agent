@@ -4,7 +4,7 @@ A conversational AI assistant for NBA fantasy basketball. Ask it things like *"w
 
 Built as a portfolio project demonstrating the full Forward Deployed Engineer lifecycle: **messy real-world integration → agentic AI → productionization → observability → a data-driven improvement loop.**
 
-> **Status:** Phases 1 & 2 complete — the data layer, the LangGraph/Claude agent, the streaming FastAPI API, guardrails, and the eval harness are built and tested (fake-model tests need no API key). Two live-data steps are pending external gates: Yahoo Fantasy API access (awaiting Yahoo's manual approval — integration is built and tested against spec-accurate fixtures, ready to swap on approval) and an `ANTHROPIC_API_KEY` for real model calls. React UI, deployment, and the Intent-Analysis usage loop are Phase 3. See [docs/design.md](docs/design.md) and [docs/plans/](docs/plans/).
+> **Status:** Phases 1–3 built and running locally end-to-end — data layer, LangGraph/Claude agent, streaming FastAPI API, guardrails, eval harness, and a polished React chat UI (streaming answers, live tool-status chips, markdown stat tables, light/dark). Verified live against demo-mode fixtures with a real Claude key. Remaining, both externally gated: **deploy to a live URL** (Vercel + Railway/Fly — needs accounts; see the Phase 3 plan runbook) and **real Yahoo data** (awaiting Yahoo's manual API approval; integration is built + tested against spec-accurate fixtures, ready to swap on approval). See [docs/design.md](docs/design.md) and [docs/plans/](docs/plans/).
 
 ## Architecture (target)
 
@@ -54,15 +54,23 @@ uv run pytest -v          # run the test suite
 
 ## Run the agent
 
-Requires a running Postgres (`docker compose up -d db`) and an `ANTHROPIC_API_KEY` in `.env` for real model calls (tests use a fake model and need neither).
+Requires a running Postgres (`docker compose up -d db`) and, for real model calls, an `ANTHROPIC_API_KEY` in `.env` (tests use a fake model and need neither). Set `DEMO_MODE=true` to run against the committed fixtures before Yahoo API access is approved.
+
+Backend (from repo root — `PYTHONPATH=src` because the package runs from `src/`):
 
 ```bash
-uv run python scripts/run_migrations.py       # create/upgrade schema
-uv run python scripts/setup_checkpointer.py   # create LangGraph checkpoint tables (once)
-uv run uvicorn fantasy_gm.api:app --reload    # POST /chat (SSE), GET /health
+uv run python scripts/run_migrations.py        # create/upgrade schema
+uv run python scripts/seed_demo_data.py        # demo schedule + stat snapshots
+PYTHONPATH=src uv run uvicorn fantasy_gm.api:app --port 8000   # POST /chat (SSE), /health
 ```
 
-`POST /chat` takes `{"message": str, "conversation_id": str}` and streams Server-Sent Events: `tool` events as the agent calls toolbox functions, and a final `final` event with the answer text. `conversation_id` is threaded through as the LangGraph `thread_id`, so conversation history persists in Postgres across requests once the agent is built with a `PostgresSaver` checkpointer.
+Frontend (from `frontend/`):
+
+```bash
+npm install && npm run dev                     # opens http://localhost:5173
+```
+
+`POST /chat` takes `{"message": str, "conversation_id": str}` and streams Server-Sent Events: `tool` (agent called a toolbox function), `token` (answer text delta), `final` (whole answer, fallback for non-streaming models), and `done`. `conversation_id` is threaded through as the LangGraph `thread_id`, and a `PostgresSaver` checkpointer (opened at app startup) persists conversation history across requests.
 
 ## Trade-offs
 
