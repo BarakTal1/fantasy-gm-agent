@@ -16,6 +16,14 @@ def test_category_profile_you_vs_league_average():
     assert prof["PTS"]["league_avg"] == 15  # (20+10)/2
 
 
+def test_category_profile_averages_percentage_cats():
+    # percentages must average across the roster, not sum
+    mine = Team(team_key="t1", name="Mine",
+                players=[_p("1", **{"FG%": 0.50}), _p("2", **{"FG%": 0.40})])
+    prof = category_profile(mine, [mine], ["FG%"])
+    assert prof["FG%"]["you"] == 0.45
+
+
 def test_streaming_board_ranks_by_form_times_games():
     fas = [_p("1", PTS=10), _p("2", PTS=10)]
     trends = {"1": {"PTS": 12.0}, "2": {"PTS": 8.0}}

@@ -4,6 +4,7 @@ get_trends) return real values in demo mode. Run after run_migrations.py.
     uv run python scripts/seed_demo_data.py
 """
 import json
+import random
 import sys
 from datetime import date, timedelta
 from pathlib import Path
@@ -41,15 +42,20 @@ def seed_snapshots() -> None:
     for t in demo.demo_teams():
         players.extend(t.players)
     today = date.today()
+    # Give recent form a per-player drift vs the season line so buy-low/sell-high
+    # has real signal (some players hot, some cold). Deterministic (seeded).
+    rng = random.Random(7)
     n = 0
     for p in players:
+        factor = rng.uniform(0.7, 1.3)  # <1 cold (buy-low), >1 hot (sell-high)
+        recent = {k: round(v * factor, 3) for k, v in p.stats.items()}
         for d in range(3):  # last 3 days -> get_trends(14d) averages them
             execute(
                 "INSERT INTO player_stat_snapshots (player_id, snapshot_date, stats) "
                 "VALUES (%s, %s, %s) "
                 "ON CONFLICT (player_id, snapshot_date) DO UPDATE SET "
                 "stats=EXCLUDED.stats",
-                (p.player_id, today - timedelta(days=d), json.dumps(p.stats)),
+                (p.player_id, today - timedelta(days=d), json.dumps(recent)),
             )
             n += 1
     print(f"seeded {n} player_stat_snapshots for {len(players)} players")

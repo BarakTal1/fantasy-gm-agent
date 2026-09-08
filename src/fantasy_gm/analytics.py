@@ -2,7 +2,14 @@ from fantasy_gm.schemas import Player, Team
 
 
 def _team_totals(team: Team, cats: list[str]) -> dict[str, float]:
-    return {c: round(sum(p.stat(c) for p in team.players), 2) for c in cats}
+    # Counting cats sum across the roster; percentage cats (FG%/FT%) average,
+    # since you can't add shooting percentages.
+    def agg(c: str) -> float:
+        vals = [p.stat(c) for p in team.players]
+        if c.endswith("%"):
+            return sum(vals) / len(vals) if vals else 0.0
+        return sum(vals)
+    return {c: round(agg(c), 2) for c in cats}
 
 
 def category_profile(my_team: Team, all_teams: list[Team],
