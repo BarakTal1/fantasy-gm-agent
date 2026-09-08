@@ -1,5 +1,11 @@
-from fantasy_gm.analytics import buy_low_sell_high, category_profile, streaming_board
-from fantasy_gm.schemas import Player, Team
+from fantasy_gm.analytics import (
+    buy_low_sell_high,
+    category_profile,
+    points_value_board,
+    recommended_pickups,
+    streaming_board,
+)
+from fantasy_gm.schemas import LeagueSettings, Player, Team
 
 CATS = ["PTS", "AST", "TO"]
 
@@ -38,3 +44,28 @@ def test_buy_low_sell_high_flags_divergence():
     trends = {"1": {"PTS": 10.0}}  # cold vs season -> buy low
     res = buy_low_sell_high(players, trends, cats=["PTS"])
     assert res[0]["signal"] == "buy_low"
+
+
+def _team(name, players): return Team(team_key=name, name=name, players=players)
+
+
+def test_recommended_pickups_category_prefers_my_weak_cats(monkeypatch):
+    cat = LeagueSettings(league_key="k", format="category", categories=["PTS", "AST"])
+    mine = _team("Mine", [_p("1", PTS=30, AST=1)])          # strong PTS, weak AST
+    league = [mine, _team("Rival", [_p("2", PTS=10, AST=9)])]
+    fas = [_p("A", PTS=0, AST=8), _p("B", PTS=10, AST=0)]    # A helps my weak AST
+    trends = {"A": {"PTS": 0, "AST": 8}, "B": {"PTS": 10, "AST": 0}}
+    games = {"LAL": 3}
+    recs = recommended_pickups(mine, league, fas, trends, games, cat)
+    assert recs[0]["player_id"] == "A"                       # need-weighting favors A
+    assert "drop" in recs[0]                                  # suggests a drop
+
+
+def test_points_value_board_ranks_by_projected_points():
+    pts = LeagueSettings(league_key="k", format="points",
+                         point_weights={"PTS": 1.0})
+    fas = [_p("A", PTS=10), _p("B", PTS=20)]
+    trends = {"A": {"PTS": 10}, "B": {"PTS": 20}}
+    board = points_value_board(fas, trends, {"LAL": 4}, pts)
+    assert board[0]["player_id"] == "B"
+    assert board[0]["projected_points"] == 80.0  # 20 * 4
