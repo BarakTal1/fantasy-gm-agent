@@ -78,10 +78,6 @@ def _load_league() -> LeagueSettings:
 MY_WEEK = 15  # demo week
 
 
-def _league_cats() -> list[str]:
-    return _load_league().categories
-
-
 def _all_teams():
     return get_all_teams(LEAGUE_KEY)
 
@@ -105,17 +101,29 @@ def _players_by_id(ids: list[str]) -> dict:
 
 
 def _verdict(delta, summary, give, get) -> str:
-    """Single focused Claude call grounded in the computed deltas."""
+    """Single focused Claude call grounded in the computed deltas.
+    `summary` is None for a points-league delta (net fantasy points); otherwise
+    `delta`/`summary` are the category-league per-category delta + improved/worsened."""
     model = _make_model()
-    prompt = (
-        "You are an honest NBA fantasy trade analyst for a category league.\n"
-        f"Net category change to the user's team (positive = more of that cat; "
-        f"for TO, negative is better): {delta}.\n"
-        f"Categories improved: {summary['improved']}; worsened: {summary['worsened']}.\n"
-        f"Giving away: {[p.name for p in give]}; receiving: {[p.name for p in get]}.\n"
-        "Give a 3-4 sentence honest verdict and end with exactly one of: "
-        "ACCEPT, DECLINE, or COUNTER."
-    )
+    if summary is None:
+        prompt = (
+            "You are an honest NBA fantasy trade analyst for a points league.\n"
+            f"Net fantasy-points change to the user's team: {delta['net']} "
+            f"(giving up {delta['give_value']} pts, receiving {delta['get_value']} pts).\n"
+            f"Giving away: {[p.name for p in give]}; receiving: {[p.name for p in get]}.\n"
+            "Give a 3-4 sentence honest verdict and end with exactly one of: "
+            "ACCEPT, DECLINE, or COUNTER."
+        )
+    else:
+        prompt = (
+            "You are an honest NBA fantasy trade analyst for a category league.\n"
+            f"Net category change to the user's team (positive = more of that cat; "
+            f"for TO, negative is better): {delta}.\n"
+            f"Categories improved: {summary['improved']}; worsened: {summary['worsened']}.\n"
+            f"Giving away: {[p.name for p in give]}; receiving: {[p.name for p in get]}.\n"
+            "Give a 3-4 sentence honest verdict and end with exactly one of: "
+            "ACCEPT, DECLINE, or COUNTER."
+        )
     return _text(model.invoke(prompt).content)
 
 
@@ -146,37 +154,61 @@ def health() -> dict:
     return {"status": "ok"}
 
 
+@app.get("/league/teams")
+def league_teams() -> dict:
+    return {"my_team_key": MY_TEAM_KEY,
+            "teams": [t.model_dump() for t in _all_teams()]}
+
+
 @app.get("/analytics/dashboard")
 def dashboard() -> dict:
-    cats = _league_cats()
+    league = _load_league()
     teams = _all_teams()
     mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
     fas = _free_agents()
     games = _week_games()
     fa_trends = _trends_for([p.player_id for p in fas])
     roster_trends = _trends_for([p.player_id for p in mine.players])
-    return {
-        "category_profile": analytics.category_profile(mine, teams, cats),
-        "streaming_board": analytics.streaming_board(fas, fa_trends, games, cats)[:12],
-        "buy_low_sell_high": analytics.buy_low_sell_high(
-            mine.players + fas, {**roster_trends, **fa_trends}, cats)[:12],
+    common = {
+        "format": league.format,
         "schedule": games,
+        "recommended_pickups": analytics.recommended_pickups(
+            mine, teams, fas, fa_trends, games, league),
+        "buy_low_sell_high": analytics.buy_low_sell_high(
+            mine.players + fas, {**roster_trends, **fa_trends}, league.categories)[:12]
+        if league.is_category else [],
     }
+    if league.is_points:
+        common["points_value_board"] = analytics.points_value_board(
+            fas, fa_trends, games, league)
+    else:
+        common["category_profile"] = analytics.category_profile(
+            mine, teams, league.categories)
+        common["streaming_board"] = analytics.streaming_board(
+            fas, fa_trends, games, league.categories)[:12]
+    return common
 
 
 @app.post("/trade/analyze")
 def trade_analyze(req: TradeRequest) -> dict:
-    cats = _league_cats()
+    league = _load_league()
     byid = _players_by_id(req.give + req.get)
     give = [byid[i] for i in req.give if i in byid]
     get = [byid[i] for i in req.get if i in byid]
-    delta = trade.category_delta(give, get, cats)
+    if league.is_points:
+        delta = trade.points_delta(give, get, league)
+        verdict = _verdict(delta, None, give, get)
+        rec = ("ACCEPT" if "ACCEPT" in verdict else
+               "COUNTER" if "COUNTER" in verdict else "DECLINE")
+        return {"format": league.format, "delta": delta, "verdict": verdict,
+                "recommendation": rec}
+    delta = trade.category_delta(give, get, league.categories)
     summary = trade.summarize(delta)
     verdict = _verdict(delta, summary, give, get)
     rec = ("ACCEPT" if "ACCEPT" in verdict else
            "COUNTER" if "COUNTER" in verdict else "DECLINE")
-    return {"delta": delta, "summary": summary, "verdict": verdict,
-            "recommendation": rec}
+    return {"format": league.format, "delta": delta, "summary": summary,
+            "verdict": verdict, "recommendation": rec}
 
 
 @app.post("/chat")
