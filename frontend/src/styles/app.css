@@ -97,3 +97,26 @@
   font-size: 11px; }
 .heat .cell b { font-size: 12px; }
 .heat .cell span { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+/* Trade view */
+.trade-form { display: flex; flex-direction: column; gap: 4px; max-width: 480px; margin-bottom: 20px; }
+.trade-form label { font-size: 13px; color: var(--muted); margin-top: 8px; }
+.trade-form input { padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text); font: inherit; }
+.trade-form button { margin-top: 12px; min-height: 44px; border: none; border-radius: var(--radius-sm);
+  background: var(--primary); color: var(--on-primary); font-weight: 600; cursor: pointer; }
+.trade-form button:disabled { opacity: .6; cursor: default; }
+.verdict-card { display: flex; align-items: flex-start; gap: 12px; padding: 16px; margin-bottom: 16px;
+  border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); }
+.verdict-card .badge { flex-shrink: 0; padding: 4px 10px; border-radius: 999px; font-weight: 700;
+  font-size: 12px; letter-spacing: .04em; border: 1px solid var(--border); }
+.verdict-card.rec-accept .badge { color: var(--accent); border-color: var(--accent); }
+.verdict-card.rec-decline .badge { color: var(--danger); border-color: var(--danger); }
+.verdict-card.rec-counter .badge { color: var(--primary); border-color: var(--primary); }
+.verdict-card p { margin: 0; line-height: 1.6; }
+.delta-table { width: 100%; border-collapse: collapse; }
+.delta-table th, .delta-table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+.delta-table .delta-label { color: var(--muted); font-size: 12px; }
+.delta-table tr.good td:first-child { border-left: 4px solid var(--accent); }
+.delta-table tr.bad td:first-child { border-left: 4px solid var(--danger); }
+.delta-table em { font-style: normal; color: var(--muted); font-size: 12px; margin-left: 4px; }
