@@ -58,7 +58,14 @@ export function TradeView() {
     return <ErrorBanner message={`Failed to load rosters: ${loadError}`} onRetry={loadTeams} />;
   }
   if (!teams || myTeamKey === null) {
-    return <div className="empty">Loading rosters…</div>;
+    return (
+      <div className="trade" aria-busy="true" aria-live="polite">
+        <span className="sr-table">Loading rosters…</span>
+        <div className="skeleton skeleton-row" />
+        <div className="skeleton skeleton-row" />
+        <div className="skeleton skeleton-block" />
+      </div>
+    );
   }
 
   const myTeam = teams.find((t) => t.team_key === myTeamKey) ?? teams[0];

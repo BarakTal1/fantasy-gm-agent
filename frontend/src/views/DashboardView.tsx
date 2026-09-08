@@ -74,7 +74,16 @@ export function DashboardView() {
   useEffect(load, []);
 
   if (error) return <ErrorBanner message={`Failed to load dashboard: ${error}`} onRetry={load} />;
-  if (!data) return <div className="empty">Loading dashboard…</div>;
+  if (!data) {
+    return (
+      <div className="dashboard" aria-busy="true" aria-live="polite">
+        <span className="sr-table">Loading dashboard…</span>
+        <div className="skeleton skeleton-block" />
+        <div className="skeleton skeleton-block" />
+        <div className="skeleton skeleton-block" />
+      </div>
+    );
+  }
 
   const hasRecommendations = data.recommended_pickups.length > 0;
   const hasAnyContent = hasRecommendations ||
