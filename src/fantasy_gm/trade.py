@@ -1,4 +1,5 @@
-from fantasy_gm.schemas import Player
+from fantasy_gm import scoring
+from fantasy_gm.schemas import LeagueSettings, Player
 
 
 def category_delta(give: list[Player], get: list[Player],
@@ -23,3 +24,11 @@ def summarize(delta: dict[str, float]) -> dict:
             continue
         (improved if good else worsened).append(c)
     return {"improved": improved, "worsened": worsened}
+
+
+def points_delta(give, get, settings: LeagueSettings) -> dict:
+    gv = round(sum(scoring.fantasy_points(p.stats, settings.point_weights)
+                   for p in give), 2)
+    tv = round(sum(scoring.fantasy_points(p.stats, settings.point_weights)
+                   for p in get), 2)
+    return {"give_value": gv, "get_value": tv, "net": round(tv - gv, 2)}
