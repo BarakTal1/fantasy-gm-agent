@@ -98,6 +98,7 @@ def chat(req: ChatRequest) -> StreamingResponse:
     def gen():
         config = {"configurable": {"thread_id": req.conversation_id}}
         emitted_token = False
+        last_id = None
         for mode, chunk in agent.stream(
             {"messages": [HumanMessage(req.message)]},
             config=config,
@@ -105,11 +106,21 @@ def chat(req: ChatRequest) -> StreamingResponse:
         ):
             if mode == "messages":
                 msg, _meta = chunk
-                text = _chunk_text(msg)
+                # Only stream assistant text — messages mode also surfaces
+                # ToolMessages (raw JSON tool results), which must NOT leak
+                # into the answer. AIMessageChunk is a subclass of AIMessage.
                 tool_calls = getattr(msg, "tool_calls", None)
-                if text and not tool_calls:
-                    emitted_token = True
-                    yield _sse("token", {"text": text})
+                if isinstance(msg, AIMessage) and not tool_calls:
+                    text = _chunk_text(msg)
+                    if text:
+                        # Separate distinct assistant turns (preamble vs final
+                        # answer) so markdown blocks don't glue together.
+                        mid = getattr(msg, "id", None)
+                        if emitted_token and mid != last_id:
+                            yield _sse("token", {"text": "\n\n"})
+                        last_id = mid
+                        emitted_token = True
+                        yield _sse("token", {"text": text})
             elif mode == "updates":
                 for _node, update in chunk.items():
                     msgs = update.get("messages", []) if isinstance(update, dict) else []
