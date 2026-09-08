@@ -90,6 +90,13 @@
 .legend .sw.you { background: var(--primary); }
 .legend .sw.league { background: var(--muted); }
 
+/* RecommendedPickups */
+.pickups { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.pickup-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.pickup-add em { font-style: normal; color: var(--muted); margin-left: 4px; font-size: 12px; }
+.pickup-drop { font-size: 12px; font-weight: 600; color: var(--danger); white-space: nowrap; }
+
 /* GamesHeatmap */
 .heat { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 6px; }
 .heat .cell { display: flex; flex-direction: column; align-items: center; justify-content: center;
