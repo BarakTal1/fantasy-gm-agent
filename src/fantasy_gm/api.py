@@ -1,6 +1,8 @@
 import json
+import os
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import AIMessage, HumanMessage
@@ -12,6 +14,21 @@ from fantasy_gm.schemas import LeagueSettings
 from fantasy_gm.tools import get_league_settings
 
 app = FastAPI(title="Fantasy GM Agent")
+
+_ALLOWED_ORIGINS = [
+    "http://localhost:5173",   # Vite dev
+    "http://127.0.0.1:5173",
+]
+# In production, add the deployed frontend origin via env (see deploy runbook).
+if os.getenv("FRONTEND_ORIGIN"):
+    _ALLOWED_ORIGINS.append(os.environ["FRONTEND_ORIGIN"])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_ALLOWED_ORIGINS,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Single-user demo config — replace with real values / auth in a multi-user build.
 LEAGUE_KEY = "428.l.123456"
@@ -37,6 +54,18 @@ def _sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
 
+def _text(content) -> str:
+    if isinstance(content, str):
+        return content
+    return "".join(b.get("text", "") for b in content
+                   if isinstance(b, dict) and b.get("type") == "text")
+
+
+def _chunk_text(msg) -> str:
+    """Text delta from a streamed message chunk (Opus 5 returns block lists)."""
+    return _text(getattr(msg, "content", "") or "")
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
@@ -49,19 +78,28 @@ def chat(req: ChatRequest) -> StreamingResponse:
 
     def gen():
         config = {"configurable": {"thread_id": req.conversation_id}}
-        for chunk in agent.stream(
+        emitted_token = False
+        for mode, chunk in agent.stream(
             {"messages": [HumanMessage(req.message)]},
             config=config,
-            stream_mode="updates",
+            stream_mode=["updates", "messages"],
         ):
-            for _node, update in chunk.items():
-                msgs = update.get("messages", []) if isinstance(update, dict) else []
-                for m in msgs:
-                    tool_calls = getattr(m, "tool_calls", None)
-                    if tool_calls:
-                        for tc in tool_calls:
+            if mode == "messages":
+                msg, _meta = chunk
+                text = _chunk_text(msg)
+                tool_calls = getattr(msg, "tool_calls", None)
+                if text and not tool_calls:
+                    emitted_token = True
+                    yield _sse("token", {"text": text})
+            elif mode == "updates":
+                for _node, update in chunk.items():
+                    msgs = update.get("messages", []) if isinstance(update, dict) else []
+                    for m in msgs:
+                        for tc in getattr(m, "tool_calls", None) or []:
                             yield _sse("tool", {"name": tc["name"]})
-                    elif isinstance(m, AIMessage) and m.content:
-                        yield _sse("final", {"text": m.content})
+                        if isinstance(m, AIMessage) and _text(m.content) and not emitted_token:
+                            # fallback for non-streaming models: send the whole answer
+                            yield _sse("final", {"text": _text(m.content)})
+        yield _sse("done", {})
 
     return StreamingResponse(gen(), media_type="text/event-stream")

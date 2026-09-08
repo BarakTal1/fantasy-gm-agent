@@ -40,7 +40,7 @@ def test_chat_threads_conversation_id(monkeypatch):
     class SpyAgent:
         def stream(self, inputs, config=None, stream_mode=None):
             captured["config"] = config
-            return iter([{"agent": {"messages": [AIMessage(content="ok")]}}])
+            return iter([("updates", {"agent": {"messages": [AIMessage(content="ok")]}})])
 
     monkeypatch.setattr(api, "_load_league",
                         lambda: LeagueSettings(league_key="428.l.1", format="category"))
@@ -54,3 +54,15 @@ def test_chat_threads_conversation_id(monkeypatch):
                                     json={"message": "hi", "conversation_id": "abc"}) as r:
         list(r.iter_text())
     assert captured["config"]["configurable"]["thread_id"] == "abc"
+
+
+def test_cors_headers_present():
+    from fastapi.testclient import TestClient
+
+    from fantasy_gm import api
+    r = TestClient(api.app).options(
+        "/chat",
+        headers={"Origin": "http://localhost:5173",
+                 "Access-Control-Request-Method": "POST"},
+    )
+    assert r.headers.get("access-control-allow-origin") in {"*", "http://localhost:5173"}
