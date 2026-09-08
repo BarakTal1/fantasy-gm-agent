@@ -2,8 +2,10 @@
 
 Reads the committed demo fixtures (demo_data/) and returns clean schema objects,
 so the whole agent can run end-to-end before Yahoo API access is approved.
-Stat keys are remapped from Yahoo stat_ids to human category names (PTS, AST, ...)
-using the league settings, so the LLM sees readable stats.
+Team/free-agent data is read from the generated simple-schema files
+(demo_data/league.json, demo_data/free_agents.json) whose stat keys are already
+human category names (PTS, AST, ...). League settings still come from the
+Yahoo-shaped league_settings.json fixture.
 """
 import json
 from pathlib import Path
@@ -18,30 +20,20 @@ def _load(name: str) -> dict:
     return json.loads((DEMO_DIR / name).read_text())
 
 
-def _stat_id_to_name() -> dict[str, str]:
-    stats = (_load("league_settings.json")["fantasy_content"]["league"][1]
-             ["settings"][0]["stat_categories"]["stats"])
-    return {str(s["stat"]["stat_id"]): s["stat"]["display_name"] for s in stats}
-
-
-def _rename(players: list[Player], mapping: dict[str, str]) -> list[Player]:
-    for p in players:
-        p.stats = {mapping.get(k, k): v for k, v in p.stats.items()}
-    return players
-
-
 def demo_league_settings() -> LeagueSettings:
     return client.parse_league_settings(_load("league_settings.json"))
 
 
-def demo_free_agents() -> list[Player]:
-    return _rename(client.parse_free_agents(_load("free_agents.json")),
-                   _stat_id_to_name())
+def _player(d: dict) -> Player:
+    return Player(player_id=d["player_id"], name=d["name"], nba_team=d["nba_team"],
+                  positions=d.get("positions", []), stats=d["stats"])
 
 
 def demo_teams() -> list[Team]:
-    mapping = _stat_id_to_name()
-    teams = client.parse_teams_with_rosters(_load("roster.json"))
-    for t in teams:
-        _rename(t.players, mapping)
-    return teams
+    data = _load("league.json")
+    return [Team(team_key=t["team_key"], name=t["name"],
+                 players=[_player(p) for p in t["players"]]) for t in data["teams"]]
+
+
+def demo_free_agents() -> list[Player]:
+    return [_player(p) for p in _load("free_agents.json")["players"]]
