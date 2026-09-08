@@ -2,6 +2,25 @@ from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage
 
 
+def test_dashboard_endpoint_returns_all_sections(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.schemas import Player, Team
+    monkeypatch.setattr(api, "_league_cats", lambda: ["PTS", "AST"])
+    monkeypatch.setattr(api, "_all_teams",
+        lambda: [Team(team_key="428.l.123456.t.1", name="My Squad",
+                      players=[Player(player_id="1", name="A", nba_team="LAL",
+                                      stats={"PTS": 20, "AST": 5})])])
+    monkeypatch.setattr(api, "_free_agents",
+        lambda: [Player(player_id="9", name="FA", nba_team="LAL", stats={"PTS": 10})])
+    monkeypatch.setattr(api, "_trends_for", lambda ids: {"9": {"PTS": 11.0}})
+    monkeypatch.setattr(api, "_week_games", lambda: {"LAL": 4})
+    from fastapi.testclient import TestClient
+    body = TestClient(api.app).get("/analytics/dashboard").json()
+    assert set(body) == {"category_profile", "streaming_board",
+                         "buy_low_sell_high", "schedule"}
+    assert body["category_profile"]["PTS"]["you"] == 20
+
+
 def test_chat_streams_final_answer(monkeypatch):
     from fantasy_gm import api
     from fantasy_gm.schemas import LeagueSettings

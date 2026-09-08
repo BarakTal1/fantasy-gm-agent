@@ -1,6 +1,7 @@
 import json
 import os
 from contextlib import asynccontextmanager
+from datetime import date
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,10 +11,17 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
 from pydantic import BaseModel
 
+from fantasy_gm import analytics
 from fantasy_gm.agent import build_agent
 from fantasy_gm.config import get_settings
 from fantasy_gm.schemas import LeagueSettings
-from fantasy_gm.tools import get_league_settings
+from fantasy_gm.tools import (
+    get_all_teams,
+    get_free_agents,
+    get_league_settings,
+    get_trends,
+    get_weekly_schedule,
+)
 
 _checkpointer = None  # set at startup in production; stays None under tests
 
@@ -62,6 +70,29 @@ def _load_league() -> LeagueSettings:
     return get_league_settings(LEAGUE_KEY)
 
 
+MY_WEEK = 15  # demo week
+
+
+def _league_cats() -> list[str]:
+    return _load_league().categories
+
+
+def _all_teams():
+    return get_all_teams(LEAGUE_KEY)
+
+
+def _free_agents():
+    return get_free_agents(LEAGUE_KEY)
+
+
+def _trends_for(ids):
+    return get_trends(ids, 14, date.today())
+
+
+def _week_games():
+    return {t: v["games_remaining"] for t, v in get_weekly_schedule(MY_WEEK).items()}
+
+
 def _make_model():
     s = get_settings()
     return ChatAnthropic(model=s.agent_model, api_key=s.anthropic_api_key,
@@ -87,6 +118,24 @@ def _chunk_text(msg) -> str:
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@app.get("/analytics/dashboard")
+def dashboard() -> dict:
+    cats = _league_cats()
+    teams = _all_teams()
+    mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
+    fas = _free_agents()
+    games = _week_games()
+    fa_trends = _trends_for([p.player_id for p in fas])
+    roster_trends = _trends_for([p.player_id for p in mine.players])
+    return {
+        "category_profile": analytics.category_profile(mine, teams, cats),
+        "streaming_board": analytics.streaming_board(fas, fa_trends, games, cats)[:12],
+        "buy_low_sell_high": analytics.buy_low_sell_high(
+            mine.players + fas, {**roster_trends, **fa_trends}, cats)[:12],
+        "schedule": games,
+    }
 
 
 @app.post("/chat")
