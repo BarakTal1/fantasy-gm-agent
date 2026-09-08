@@ -30,10 +30,16 @@ def build_tools(league_key: str, my_team_key: str) -> list:
         Use for waiver/streaming/start-sit value, NOT for long-term trade value."""
         return tools.get_weekly_schedule(week)
 
+    def get_league_teams() -> list[dict]:
+        """List every team in the league with their rosters and player stats.
+        Use to scout opponents and find trade targets."""
+        return [t.model_dump() for t in tools.get_all_teams(league_key)]
+
     return [
         StructuredTool.from_function(get_my_roster),
         StructuredTool.from_function(get_free_agents),
         StructuredTool.from_function(get_league_settings),
         StructuredTool.from_function(get_trends),
         StructuredTool.from_function(get_weekly_schedule),
+        StructuredTool.from_function(get_league_teams),
     ]
