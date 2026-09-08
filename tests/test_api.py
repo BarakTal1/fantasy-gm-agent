@@ -66,3 +66,26 @@ def test_cors_headers_present():
                  "Access-Control-Request-Method": "POST"},
     )
     assert r.headers.get("access-control-allow-origin") in {"*", "http://localhost:5173"}
+
+
+def test_chat_passes_checkpointer(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.schemas import LeagueSettings
+    seen = {}
+
+    class SpyAgent:
+        def stream(self, inputs, config=None, stream_mode=None):
+            return iter([("updates", {"agent": {"messages": [AIMessage(content="ok")]}})])
+
+    monkeypatch.setattr(api, "_load_league",
+                        lambda: LeagueSettings(league_key="428.l.1", format="category"))
+    monkeypatch.setattr(api, "_make_model", lambda: object())
+    monkeypatch.setattr(api, "_checkpointer", "SENTINEL_CP")
+    monkeypatch.setattr(api, "build_agent",
+                        lambda **kw: (seen.update(kw), SpyAgent())[1])
+
+    from fastapi.testclient import TestClient
+    with TestClient(api.app).stream("POST", "/chat",
+                                    json={"message": "hi", "conversation_id": "c"}) as r:
+        list(r.iter_text())
+    assert seen["checkpointer"] == "SENTINEL_CP"

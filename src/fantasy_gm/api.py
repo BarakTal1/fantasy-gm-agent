@@ -1,11 +1,13 @@
 import json
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import AIMessage, HumanMessage
+from langgraph.checkpoint.postgres import PostgresSaver
 from pydantic import BaseModel
 
 from fantasy_gm.agent import build_agent
@@ -13,7 +15,23 @@ from fantasy_gm.config import get_settings
 from fantasy_gm.schemas import LeagueSettings
 from fantasy_gm.tools import get_league_settings
 
-app = FastAPI(title="Fantasy GM Agent")
+_checkpointer = None  # set at startup in production; stays None under tests
+
+
+@asynccontextmanager
+async def lifespan(_app):
+    global _checkpointer
+    cm = PostgresSaver.from_conn_string(get_settings().database_url)
+    _checkpointer = cm.__enter__()
+    _checkpointer.setup()
+    try:
+        yield
+    finally:
+        cm.__exit__(None, None, None)
+        _checkpointer = None
+
+
+app = FastAPI(title="Fantasy GM Agent", lifespan=lifespan)
 
 _ALLOWED_ORIGINS = [
     "http://localhost:5173",   # Vite dev
@@ -74,7 +92,8 @@ def health() -> dict:
 @app.post("/chat")
 def chat(req: ChatRequest) -> StreamingResponse:
     agent = build_agent(league=_load_league(), league_key=LEAGUE_KEY,
-                        my_team_key=MY_TEAM_KEY, model=_make_model())
+                        my_team_key=MY_TEAM_KEY, model=_make_model(),
+                        checkpointer=_checkpointer)
 
     def gen():
         config = {"configurable": {"thread_id": req.conversation_id}}
