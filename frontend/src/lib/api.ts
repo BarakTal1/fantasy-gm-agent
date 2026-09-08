@@ -14,6 +14,12 @@ export interface Team {
   players: Player[];
 }
 
+export async function getLeagueInfo() {
+  const r = await fetch(`${API_BASE}/league/info`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json() as Promise<{ name: string; format: string; format_label: string }>;
+}
+
 export async function getDashboard() {
   const r = await fetch(`${API_BASE}/analytics/dashboard`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
