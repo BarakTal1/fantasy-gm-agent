@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import App from "../App";
+import { ChatView } from "../views/ChatView";
 
 function streamResponse(frames: string[]) {
   const enc = new TextEncoder();
@@ -13,7 +13,7 @@ function streamResponse(frames: string[]) {
 
 beforeEach(() => { localStorage.clear(); });
 
-describe("App", () => {
+describe("ChatView", () => {
   it("sends a message and renders the streamed answer", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(streamResponse([
       'event: tool\ndata: {"name":"get_free_agents"}\n\n',
@@ -21,7 +21,7 @@ describe("App", () => {
       'event: token\ndata: {"text":"Josh Hart."}\n\n',
       'event: done\ndata: {}\n\n',
     ]));
-    render(<App />);
+    render(<ChatView />);
     await userEvent.type(screen.getByRole("textbox"), "who do I add?");
     await userEvent.click(screen.getByRole("button", { name: /send/i }));
     expect(await screen.findByText(/Add Josh Hart\./)).toBeInTheDocument();
