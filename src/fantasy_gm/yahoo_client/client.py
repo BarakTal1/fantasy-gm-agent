@@ -26,6 +26,7 @@ def parse_league_settings(raw: dict[str, Any]) -> LeagueSettings:
     league = raw["fantasy_content"]["league"]
     settings = league[1]["settings"][0]
     league_key = league[0]["league_key"]
+    league_name = league[0].get("name", "")
     scoring = settings.get("scoring_type", "head")
     fmt = "points" if "point" in scoring else "category"
     categories = [
@@ -40,8 +41,8 @@ def parse_league_settings(raw: dict[str, Any]) -> LeagueSettings:
             sid = str(m["stat"]["stat_id"])
             if sid in id_to_name:
                 weights[id_to_name[sid]] = float(m["stat"]["value"])
-    return LeagueSettings(league_key=league_key, format=fmt, categories=categories,
-                          point_weights=weights)
+    return LeagueSettings(league_key=league_key, format=fmt, name=league_name,
+                          categories=categories, point_weights=weights)
 
 
 def _parse_player(pdata: list) -> Player:

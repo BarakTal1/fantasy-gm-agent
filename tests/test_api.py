@@ -163,3 +163,15 @@ def test_chat_passes_checkpointer(monkeypatch):
                                     json={"message": "hi", "conversation_id": "c"}) as r:
         list(r.iter_text())
     assert seen["checkpointer"] == "SENTINEL_CP"
+
+
+def test_league_info_endpoint(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.schemas import LeagueSettings
+    monkeypatch.setattr(api, "_league_info",
+                        lambda: LeagueSettings(league_key="k", format="points",
+                                               name="My Real League"))
+    from fastapi.testclient import TestClient
+    body = TestClient(api.app).get("/league/info").json()
+    assert body == {"name": "My Real League", "format": "points",
+                    "format_label": "Points"}

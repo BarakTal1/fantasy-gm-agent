@@ -154,6 +154,19 @@ def health() -> dict:
     return {"status": "ok"}
 
 
+def _league_info() -> LeagueSettings:
+    # Fetch fresh (demo or live) so the league NAME is present — the Postgres
+    # league_config cache stores format/categories but not the display name.
+    from fantasy_gm.yahoo_client import client as yahoo_client
+    return yahoo_client.fetch_league_settings(LEAGUE_KEY)
+
+
+@app.get("/league/info")
+def league_info() -> dict:
+    s = _league_info()
+    return {"name": s.name, "format": s.format, "format_label": s.format_label}
+
+
 @app.get("/league/teams")
 def league_teams() -> dict:
     return {"my_team_key": MY_TEAM_KEY,

@@ -21,6 +21,7 @@ class Team(BaseModel):
 class LeagueSettings(BaseModel):
     league_key: str
     format: str                        # "category" | "points"
+    name: str = ""                     # league display name
     categories: list[str] = Field(default_factory=list)
     roster_slots: dict[str, int] = Field(default_factory=dict)
     point_weights: dict[str, float] = Field(default_factory=dict)  # points leagues only
@@ -32,3 +33,10 @@ class LeagueSettings(BaseModel):
     @property
     def is_points(self) -> bool:
         return self.format == "points"
+
+    @property
+    def format_label(self) -> str:
+        """Short human label for the header, e.g. '9-cat' or 'Points'."""
+        if self.is_points:
+            return "Points"
+        return f"{len(self.categories)}-cat" if self.categories else "Category"

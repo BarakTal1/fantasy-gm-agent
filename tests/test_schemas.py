@@ -18,3 +18,12 @@ def test_league_settings_points_format():
     assert s.is_points is True
     assert s.is_category is False
     assert s.point_weights["AST"] == 1.5
+
+
+def test_format_label():
+    from fantasy_gm.schemas import LeagueSettings
+    cat = LeagueSettings(league_key="k", format="category",
+                         categories=["PTS", "AST", "REB"])
+    pts = LeagueSettings(league_key="k", format="points")
+    assert cat.format_label == "3-cat"
+    assert pts.format_label == "Points"
