@@ -1,9 +1,29 @@
 import { API_BASE } from "./config";
 
+export interface Player {
+  player_id: string;
+  name: string;
+  nba_team: string;
+  positions?: string[];
+  stats: Record<string, number>;
+}
+
+export interface Team {
+  team_key: string;
+  name: string;
+  players: Player[];
+}
+
 export async function getDashboard() {
   const r = await fetch(`${API_BASE}/analytics/dashboard`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
+}
+
+export async function getTeams() {
+  const r = await fetch(`${API_BASE}/league/teams`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json() as Promise<{ my_team_key: string; teams: Team[] }>;
 }
 
 export async function analyzeTrade(give: string[], get: string[]) {

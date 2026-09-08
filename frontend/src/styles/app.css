@@ -99,13 +99,35 @@
 .heat .cell span { font-variant-numeric: tabular-nums; color: var(--muted); }
 
 /* Trade view */
-.trade-form { display: flex; flex-direction: column; gap: 4px; max-width: 480px; margin-bottom: 20px; }
-.trade-form label { font-size: 13px; color: var(--muted); margin-top: 8px; }
-.trade-form input { padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);
-  background: var(--surface-2); color: var(--text); font: inherit; }
-.trade-form button { margin-top: 12px; min-height: 44px; border: none; border-radius: var(--radius-sm);
-  background: var(--primary); color: var(--on-primary); font-weight: 600; cursor: pointer; }
-.trade-form button:disabled { opacity: .6; cursor: default; }
+
+/* PlayerPicker */
+.trade-pickers { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
+.player-picker { display: flex; flex-direction: column; gap: 8px; }
+.picker-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.picker-empty { color: var(--muted); font-size: 13px; margin: 0; }
+.picker-list { display: flex; flex-wrap: wrap; gap: 8px; max-height: 220px; overflow-y: auto; }
+.picker-btn { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  min-height: 44px; padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); cursor: pointer; font: inherit; text-align: left; }
+.picker-btn em { font-style: normal; font-size: 11px; color: var(--muted); }
+.picker-btn.selected { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 14%, var(--surface)); }
+.picker-btn.selected em { color: var(--primary); }
+.picker-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.opponent-select { display: flex; flex-direction: column; gap: 4px; }
+.opponent-select label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.opponent-select select { min-height: 44px; padding: 8px 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; }
+
+.selected-cards { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.selected-card { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; border: 1px solid var(--border); }
+.selected-card.give { color: var(--danger); border-color: var(--danger); }
+.selected-card.get { color: var(--accent); border-color: var(--accent); }
+
+.analyze-btn { min-height: 44px; padding: 0 20px; border: none; border-radius: var(--radius-sm);
+  background: var(--primary); color: var(--on-primary); font-weight: 600; cursor: pointer;
+  margin-bottom: 20px; }
+.analyze-btn:disabled { opacity: .6; cursor: default; }
 .verdict-card { display: flex; align-items: flex-start; gap: 12px; padding: 16px; margin-bottom: 16px;
   border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); }
 .verdict-card .badge { flex-shrink: 0; padding: 4px 10px; border-radius: 999px; font-weight: 700;
