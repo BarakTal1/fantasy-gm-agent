@@ -12,6 +12,17 @@ export function DivergingList({ items }: {
           </li>
         ))}
       </ul>
+      <table className="sr-table">
+        <caption>Buy-low / sell-high signals</caption>
+        <thead><tr><th>Player</th><th>Signal</th><th>14-day vs season</th></tr></thead>
+        <tbody>{items.map((i) => (
+          <tr key={i.label}>
+            <td>{i.label}</td>
+            <td>{i.signal === "buy_low" ? "Buy-low" : "Sell-high"}</td>
+            <td>{i.value}%</td>
+          </tr>
+        ))}</tbody>
+      </table>
     </figure>
   );
 }
