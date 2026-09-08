@@ -35,6 +35,15 @@ The design deliberately isolates all Yahoo messiness (OAuth token refresh, legac
 - **`guardrails.py`** — grounding check that flags any player named in an answer that the tools didn't return.
 - **`evals/`** — grounding + tool-trajectory scorers and a LangSmith dataset harness (the pre-ship quality gate).
 
+**Phase 3 — React chat UI**
+- **`frontend/`** — a Vite + React + TS chat: streaming answers, live tool-status chips, markdown stat tables, empty state, light/dark. Consumes the SSE stream.
+
+**Phase 4 — dashboard, trade analyzer & full-league data**
+- **`analytics.py` + `GET /analytics/dashboard`** — category profile (you vs league), streaming board (form × games), and buy-low/sell-high signals.
+- **`trade.py` + `POST /trade/analyze`** — hybrid trade engine: deterministic per-category value delta → Claude writes an honest verdict grounded in that math (ACCEPT/DECLINE/COUNTER).
+- **`frontend/` Dashboard + Trade views** — three-tab app (Chat · Dashboard · Trade) with hand-built dataviz charts (radar, ranked bars, diverging list, games heatmap), each with a legend + accessible table fallback.
+- Backed by a seeded **12-team demo league** (`scripts/gen_demo_league.py`) so every view has substance before real Yahoo data.
+
 ## Security & Auth
 
 - Secrets (`YAHOO_CLIENT_ID/SECRET`, API keys, DB URL) come from environment variables only, never committed. See `.env.example`.
