@@ -2,8 +2,9 @@ import json
 import os
 from contextlib import asynccontextmanager
 from datetime import date
+from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from langchain_anthropic import ChatAnthropic
@@ -11,9 +12,10 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
 from pydantic import BaseModel
 
-from fantasy_gm import analytics, trade
+from fantasy_gm import analytics, trade, trades_history, users
 from fantasy_gm.agent import build_agent
 from fantasy_gm.config import get_settings
+from fantasy_gm.db import execute
 from fantasy_gm.ratelimit import RateLimiter
 from fantasy_gm.schemas import LeagueSettings
 from fantasy_gm.tools import (
@@ -23,6 +25,8 @@ from fantasy_gm.tools import (
     get_trends,
     get_weekly_schedule,
 )
+
+_DEMO_DIR = Path(__file__).resolve().parent.parent.parent / "demo_data"
 
 _checkpointer = None  # set at startup in production; stays None under tests
 
@@ -56,6 +60,7 @@ app.add_middleware(
     # Allow the Vercel frontend (production + preview deploys) without depending
     # on an exact FRONTEND_ORIGIN env match (trailing slash / preview-hash safe).
     allow_origin_regex=r"https://fantasy-gm-agent.*\.vercel\.app",
+    allow_credentials=True,   # send/receive the session cookie cross-origin
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -84,8 +89,94 @@ class TradeRequest(BaseModel):
     get: list[str]
 
 
+class Credentials(BaseModel):
+    email: str
+    password: str
+
+
+class SettingsPatch(BaseModel):
+    league_format: str
+
+
+_COOKIE = "session"
+
+
+def _set_session(response: Response, user_id: int) -> None:
+    # SameSite=None; Secure is required for the Vercel↔Railway cross-site cookie.
+    response.set_cookie(_COOKIE, users.make_token(user_id), httponly=True,
+                        secure=True, samesite="none",
+                        max_age=30 * 24 * 3600, path="/")
+
+
+def _current_user(request: Request) -> dict | None:
+    tok = request.cookies.get(_COOKIE)
+    uid = users.decode_token(tok) if tok else None
+    return users.get_user_by_id(uid) if uid else None
+
+
+def _format_for(request: Request) -> str:
+    u = _current_user(request)
+    return u["league_format"] if u else get_settings().demo_league_format
+
+
 def _load_league() -> LeagueSettings:
     return get_league_settings(LEAGUE_KEY)
+
+
+def _league_for(fmt: str) -> LeagueSettings:
+    """League settings for the requested format. In demo mode this derives the
+    settings directly (the single-league Postgres cache can't hold two formats at
+    once); live mode returns the real Yahoo league regardless of `fmt`."""
+    if get_settings().demo_mode:
+        from fantasy_gm import demo
+        return demo.demo_league_settings(fmt)
+    return _load_league()
+
+
+@app.post("/auth/register")
+def register(creds: Credentials, response: Response) -> dict:
+    if not creds.email or not creds.password:
+        raise HTTPException(status_code=400, detail="Email and password required.")
+    if users.get_user_by_email(creds.email):
+        raise HTTPException(status_code=409, detail="Email already registered.")
+    u = users.create_user(creds.email, creds.password)
+    _set_session(response, u["id"])
+    return {"email": u["email"], "league_format": u["league_format"]}
+
+
+@app.post("/auth/login")
+def login(creds: Credentials, response: Response) -> dict:
+    u = users.get_user_by_email(creds.email)
+    if not u or not users.verify_password(creds.password, u["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid email or password.")
+    _set_session(response, u["id"])
+    return {"email": u["email"], "league_format": u["league_format"]}
+
+
+@app.post("/auth/logout")
+def logout(response: Response) -> dict:
+    response.delete_cookie(_COOKIE, path="/")
+    return {"ok": True}
+
+
+@app.get("/auth/me")
+def me(request: Request) -> dict:
+    u = _current_user(request)
+    if not u:
+        raise HTTPException(status_code=401, detail="Not signed in.")
+    return {"email": u["email"], "league_format": u["league_format"]}
+
+
+@app.patch("/settings")
+def update_settings(patch: SettingsPatch, request: Request) -> dict:
+    u = _current_user(request)
+    if not u:
+        raise HTTPException(status_code=401, detail="Not signed in.")
+    if patch.league_format not in {"category", "points"}:
+        raise HTTPException(status_code=400, detail="Invalid league format.")
+    execute("UPDATE users SET league_format=%s WHERE id=%s",
+            (patch.league_format, u["id"]))
+    return {"league_format": patch.league_format}
 
 
 MY_WEEK = 15  # demo week
@@ -175,8 +266,14 @@ def _league_info() -> LeagueSettings:
 
 
 @app.get("/league/info")
-def league_info() -> dict:
-    s = _league_info()
+def league_info(request: Request) -> dict:
+    # Demo mode reflects the signed-in user's chosen format (and the fixture name);
+    # live mode fetches fresh from Yahoo so the league display name is present.
+    if get_settings().demo_mode:
+        from fantasy_gm import demo
+        s = demo.demo_league_settings(_format_for(request))
+    else:
+        s = _league_info()
     return {"name": s.name, "format": s.format, "format_label": s.format_label}
 
 
@@ -187,8 +284,8 @@ def league_teams() -> dict:
 
 
 @app.get("/analytics/dashboard")
-def dashboard() -> dict:
-    league = _load_league()
+def dashboard(request: Request) -> dict:
+    league = _league_for(_format_for(request))
     teams = _all_teams()
     mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
     fas = _free_agents()
@@ -215,10 +312,28 @@ def dashboard() -> dict:
     return common
 
 
+@app.get("/analytics/weekdays")
+def weekdays() -> dict:
+    """Per-weekday count of my players with an NBA game, flagging thin days."""
+    teams = _all_teams()
+    mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
+    day_teams = json.loads((_DEMO_DIR / "schedule_by_day.json").read_text())
+    return {"days": analytics.weekday_coverage(mine.players, day_teams)}
+
+
+@app.get("/trades/history")
+def trade_history() -> dict:
+    """Fabricated past trades with per-player before/after stats (demo shell)."""
+    by_id = {p.player_id: p for t in _all_teams() for p in t.players}
+    by_id.update({p.player_id: p for p in _free_agents()})
+    trades = json.loads((_DEMO_DIR / "trade_history.json").read_text())
+    return {"trades": trades_history.build_history(trades, by_id)}
+
+
 @app.post("/trade/analyze")
 def trade_analyze(req: TradeRequest, request: Request) -> dict:
     _guard(request)
-    league = _load_league()
+    league = _league_for(_format_for(request))
     byid = _players_by_id(req.give + req.get)
     give = [byid[i] for i in req.give if i in byid]
     get = [byid[i] for i in req.get if i in byid]
@@ -241,7 +356,7 @@ def trade_analyze(req: TradeRequest, request: Request) -> dict:
 @app.post("/chat")
 def chat(req: ChatRequest, request: Request) -> StreamingResponse:
     _guard(request)
-    agent = build_agent(league=_load_league(), league_key=LEAGUE_KEY,
+    agent = build_agent(league=_league_for(_format_for(request)), league_key=LEAGUE_KEY,
                         my_team_key=MY_TEAM_KEY, model=_make_model(),
                         checkpointer=_checkpointer)
 

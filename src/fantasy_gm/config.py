@@ -25,6 +25,10 @@ class Settings(BaseSettings):
 
     anthropic_api_key: str = ""
 
+    # Signs the JWT session cookie. Override with SECRET_KEY in production
+    # (use a long random value — this dev default is only for local runs).
+    secret_key: str = "dev-secret-change-me-please-set-SECRET_KEY-in-prod"
+
     # Claude model for the agent. Default is the most capable; override via env
     # AGENT_MODEL=claude-sonnet-5 for a cheaper/faster option.
     agent_model: str = "claude-opus-5"

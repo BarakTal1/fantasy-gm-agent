@@ -1,0 +1,68 @@
+{
+  "Mon": [
+    "DEN",
+    "PHX",
+    "LAL",
+    "NYK",
+    "TOR",
+    "DET",
+    "BOS",
+    "MIA",
+    "GSW",
+    "DAL"
+  ],
+  "Tue": [
+    "SAS",
+    "CHA",
+    "POR",
+    "DEN",
+    "LAL",
+    "ATL",
+    "CHI",
+    "CLE",
+    "IND",
+    "MIL"
+  ],
+  "Wed": [
+    "NYK",
+    "HOU",
+    "MEM",
+    "NOP",
+    "OKC",
+    "SAC"
+  ],
+  "Thu": [
+    "DEN",
+    "LAL",
+    "PHX",
+    "DET",
+    "TOR",
+    "BKN",
+    "MIN",
+    "ORL"
+  ],
+  "Fri": [
+    "TOR",
+    "CHA",
+    "SAS",
+    "POR",
+    "NYK",
+    "PHI",
+    "UTA",
+    "WAS"
+  ],
+  "Sat": [
+    "PHX",
+    "LAL",
+    "DEN",
+    "DET",
+    "CHA",
+    "LAC",
+    "MIL"
+  ],
+  "Sun": [
+    "SAS",
+    "BOS",
+    "CHI"
+  ]
+}

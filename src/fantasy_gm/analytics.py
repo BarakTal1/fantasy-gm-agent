@@ -113,3 +113,23 @@ def points_value_board(free_agents, trends, games, settings: LeagueSettings,
                      "projected_points": round(
                          scoring.fantasy_points(form, settings.point_weights) * g, 1)})
     return sorted(rows, key=lambda r: r["projected_points"], reverse=True)[:limit]
+
+
+_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+
+def weekday_coverage(roster: list[Player], day_teams: dict[str, list[str]],
+                     weak_threshold: int = 4) -> list[dict]:
+    """Per weekday: how many of my players have an NBA game that day.
+
+    Thin days (few players playing) are flagged so the manager knows which days
+    to stream a waiver-wire player into an empty slot. `day_teams` maps a weekday
+    abbrev (Mon..Sun) to the NBA teams playing that day.
+    """
+    out = []
+    for d in _DAYS:
+        teams = set(day_teams.get(d, []))
+        count = sum(1 for p in roster if p.nba_team in teams)
+        out.append({"day": d, "count": count,
+                    "weak": len(teams) > 0 and count <= weak_threshold})
+    return out

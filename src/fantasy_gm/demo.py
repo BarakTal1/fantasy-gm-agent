@@ -21,8 +21,8 @@ def _load(name: str) -> dict:
     return json.loads((DEMO_DIR / name).read_text())
 
 
-def demo_league_settings() -> LeagueSettings:
-    fmt = get_settings().demo_league_format
+def demo_league_settings(fmt: str | None = None) -> LeagueSettings:
+    fmt = fmt or get_settings().demo_league_format
     fixture = ("league_settings_points.json" if fmt == "points"
                else "league_settings.json")
     return client.parse_league_settings(_load(fixture))

@@ -69,3 +69,17 @@ def test_points_value_board_ranks_by_projected_points():
     board = points_value_board(fas, trends, {"LAL": 4}, pts)
     assert board[0]["player_id"] == "B"
     assert board[0]["projected_points"] == 80.0  # 20 * 4
+
+
+def test_weekday_coverage_flags_thin_days():
+    from fantasy_gm.analytics import weekday_coverage
+    from fantasy_gm.schemas import Player
+    roster = [Player(player_id="1", name="A", nba_team="LAL"),
+              Player(player_id="2", name="B", nba_team="BOS")]
+    day_teams = {"Mon": ["LAL", "BOS"], "Tue": ["LAL"], "Wed": []}
+    cov = weekday_coverage(roster, day_teams, weak_threshold=1)
+    by_day = {c["day"]: c for c in cov}
+    assert by_day["Mon"]["count"] == 2 and by_day["Mon"]["weak"] is False
+    assert by_day["Tue"]["count"] == 1 and by_day["Tue"]["weak"] is True
+    assert by_day["Wed"]["count"] == 0 and by_day["Wed"]["weak"] is False  # no games
+    assert [c["day"] for c in cov][:3] == ["Mon", "Tue", "Wed"]            # ordered

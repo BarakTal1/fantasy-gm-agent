@@ -200,3 +200,89 @@ def test_chat_rate_limited(monkeypatch):
     r2 = c.post("/chat", json={"message": "hi", "conversation_id": "a"})
     assert r1.status_code == 200
     assert r2.status_code == 429
+
+
+def test_auth_register_login_me(db):
+    from fantasy_gm import api
+    c = TestClient(api.app)
+    r = c.post("/auth/register", json={"email": "x@y.com", "password": "pw"})
+    assert r.status_code == 200 and r.json()["email"] == "x@y.com"
+    assert c.get("/auth/me").json()["email"] == "x@y.com"   # cookie persists
+    dup = c.post("/auth/register", json={"email": "x@y.com", "password": "pw"})
+    assert dup.status_code == 409
+    c.post("/auth/logout")
+    assert c.get("/auth/me").status_code == 401
+    bad = c.post("/auth/login", json={"email": "x@y.com", "password": "nope"})
+    assert bad.status_code == 401
+    ok = c.post("/auth/login", json={"email": "x@y.com", "password": "pw"})
+    assert ok.status_code == 200
+
+
+def test_settings_patch_updates_format(db):
+    from fantasy_gm import api
+    c = TestClient(api.app)
+    c.post("/auth/register", json={"email": "s@s.com", "password": "pw"})
+    r = c.patch("/settings", json={"league_format": "points"})
+    assert r.status_code == 200 and r.json()["league_format"] == "points"
+    assert c.get("/auth/me").json()["league_format"] == "points"
+    bad = c.patch("/settings", json={"league_format": "bogus"})
+    assert bad.status_code == 400
+
+
+def test_settings_patch_requires_auth(db):
+    from fantasy_gm import api
+    r = TestClient(api.app).patch("/settings", json={"league_format": "points"})
+    assert r.status_code == 401
+
+
+def test_dashboard_uses_signed_in_user_format(db, monkeypatch):
+    from fantasy_gm.config import get_settings
+    get_settings.cache_clear()
+    monkeypatch.setenv("DEMO_MODE", "true")
+    from fantasy_gm import api, users
+    from fantasy_gm.db import execute
+    from fantasy_gm.schemas import Player, Team
+    users.create_user("p@p.com", "pw")
+    execute("UPDATE users SET league_format='points' WHERE email='p@p.com'")
+    monkeypatch.setattr(api, "_all_teams", lambda: [
+        Team(team_key=api.MY_TEAM_KEY, name="Mine",
+             players=[Player(player_id="1", name="A", nba_team="LAL", stats={"PTS": 20})])])
+    monkeypatch.setattr(api, "_free_agents", lambda: [])
+    monkeypatch.setattr(api, "_trends_for", lambda ids: {})
+    monkeypatch.setattr(api, "_week_games", lambda: {"LAL": 4})
+    c = TestClient(api.app)
+    c.post("/auth/login", json={"email": "p@p.com", "password": "pw"})
+    body = c.get("/analytics/dashboard").json()
+    assert body["format"] == "points"
+    get_settings.cache_clear()
+
+
+def test_weekdays_endpoint(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.schemas import Player, Team
+    monkeypatch.setattr(api, "_all_teams", lambda: [
+        Team(team_key=api.MY_TEAM_KEY, name="Mine",
+             players=[Player(player_id="1", name="A", nba_team="LAL")])])
+    body = TestClient(api.app).get("/analytics/weekdays").json()
+    assert len(body["days"]) == 7
+    days = {d["day"]: d for d in body["days"]}
+    assert set(days["Mon"]) == {"day", "count", "weak"}
+    assert days["Mon"]["count"] == 1      # LAL plays Mon in the fixture
+    assert days["Sun"]["count"] == 0      # LAL doesn't play Sun
+
+
+def test_trade_history_endpoint(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.schemas import Player, Team
+    monkeypatch.setattr(api, "_all_teams", lambda: [
+        Team(team_key=api.MY_TEAM_KEY, name="Mine",
+             players=[Player(player_id="1628368", name="Fox", nba_team="SAS",
+                             stats={"PTS": 25.0})])])
+    monkeypatch.setattr(api, "_free_agents", lambda: [
+        Player(player_id="1629628", name="Barrett", nba_team="TOR",
+               stats={"PTS": 20.0})])
+    body = TestClient(api.app).get("/trades/history").json()
+    assert len(body["trades"]) >= 1
+    t0 = body["trades"][0]                 # fixture: gave Barrett, got Fox
+    assert t0["got"][0]["name"] == "Fox"
+    assert t0["got"][0]["after"]["PTS"] > t0["got"][0]["before"]["PTS"]

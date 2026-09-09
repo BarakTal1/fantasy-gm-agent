@@ -29,3 +29,11 @@ CREATE TABLE IF NOT EXISTS oauth_tokens (
     expires_at    TIMESTAMPTZ NOT NULL,
     CONSTRAINT single_row CHECK (id = 1)
 );
+
+CREATE TABLE IF NOT EXISTS users (
+    id            SERIAL PRIMARY KEY,
+    email         TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    league_format TEXT NOT NULL DEFAULT 'category',
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);

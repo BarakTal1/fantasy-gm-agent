@@ -20,7 +20,7 @@ def db(monkeypatch):
     with psycopg.connect(test_url) as conn:
         conn.execute(
             "TRUNCATE league_config, player_stat_snapshots, "
-            "weekly_schedule, oauth_tokens"
+            "weekly_schedule, oauth_tokens, users"
         )
         conn.commit()
 
