@@ -1,573 +1,683 @@
 {
   "players": [
     {
-      "player_id": "1121",
-      "name": "Isaiah Grant",
+      "player_id": "1629631",
+      "name": "De'Andre Hunter",
       "nba_team": "CLE",
-      "positions": [
-        "C"
-      ],
+      "positions": [],
       "stats": {
-        "PTS": 21.8,
-        "REB": 3.7,
-        "AST": 4.6,
-        "ST": 1.1,
-        "BLK": 1.7,
-        "3PTM": 3.3,
-        "FG%": 0.496,
-        "FT%": 0.759,
-        "TO": 2.3
+        "PTS": 17.0,
+        "REB": 4.0,
+        "AST": 1.4,
+        "ST": 0.8,
+        "BLK": 0.2,
+        "TO": 1.3,
+        "3PTM": 2.5,
+        "FG%": 0.47,
+        "FT%": 0.846
       }
     },
     {
-      "player_id": "1122",
-      "name": "Marcus Cole",
-      "nba_team": "SAC",
-      "positions": [
-        "SF"
-      ],
-      "stats": {
-        "PTS": 17.3,
-        "REB": 9.5,
-        "AST": 2.3,
-        "ST": 0.4,
-        "BLK": 1.9,
-        "3PTM": 2.6,
-        "FG%": 0.471,
-        "FT%": 0.682,
-        "TO": 1.3
-      }
-    },
-    {
-      "player_id": "1123",
-      "name": "Darius Poole",
-      "nba_team": "SAC",
-      "positions": [
-        "C"
-      ],
-      "stats": {
-        "PTS": 6.7,
-        "REB": 3.5,
-        "AST": 4.6,
-        "ST": 1.0,
-        "BLK": 1.1,
-        "3PTM": 0.6,
-        "FG%": 0.429,
-        "FT%": 0.742,
-        "TO": 1.5
-      }
-    },
-    {
-      "player_id": "1124",
-      "name": "Trey Blake",
-      "nba_team": "MIL",
-      "positions": [
-        "PG"
-      ],
-      "stats": {
-        "PTS": 22.2,
-        "REB": 7.0,
-        "AST": 4.1,
-        "ST": 1.3,
-        "BLK": 0.7,
-        "3PTM": 1.2,
-        "FG%": 0.472,
-        "FT%": 0.899,
-        "TO": 1.4
-      }
-    },
-    {
-      "player_id": "1125",
-      "name": "Xavier Hayes",
-      "nba_team": "MIL",
-      "positions": [
-        "SG"
-      ],
-      "stats": {
-        "PTS": 24.8,
-        "REB": 6.5,
-        "AST": 8.2,
-        "ST": 1.1,
-        "BLK": 0.4,
-        "3PTM": 2.6,
-        "FG%": 0.528,
-        "FT%": 0.73,
-        "TO": 1.6
-      }
-    },
-    {
-      "player_id": "1126",
-      "name": "Andre Booker",
-      "nba_team": "IND",
-      "positions": [
-        "SF"
-      ],
-      "stats": {
-        "PTS": 24.7,
-        "REB": 9.1,
-        "AST": 8.4,
-        "ST": 1.4,
-        "BLK": 1.8,
-        "3PTM": 2.0,
-        "FG%": 0.427,
-        "FT%": 0.7,
-        "TO": 1.0
-      }
-    },
-    {
-      "player_id": "1127",
-      "name": "Xavier Reed",
+      "player_id": "1629655",
+      "name": "Daniel Gafford",
       "nba_team": "DAL",
-      "positions": [
-        "C"
-      ],
+      "positions": [],
       "stats": {
-        "PTS": 18.6,
-        "REB": 6.7,
-        "AST": 8.9,
-        "ST": 0.6,
-        "BLK": 2.0,
-        "3PTM": 0.6,
-        "FG%": 0.466,
-        "FT%": 0.829,
-        "TO": 1.9
-      }
-    },
-    {
-      "player_id": "1128",
-      "name": "Keon Sharp",
-      "nba_team": "DEN",
-      "positions": [
-        "SG"
-      ],
-      "stats": {
-        "PTS": 27.4,
-        "REB": 8.4,
-        "AST": 4.6,
-        "ST": 1.5,
-        "BLK": 0.9,
-        "3PTM": 3.2,
-        "FG%": 0.519,
-        "FT%": 0.81,
-        "TO": 1.2
-      }
-    },
-    {
-      "player_id": "1129",
-      "name": "Devin Sharp",
-      "nba_team": "BOS",
-      "positions": [
-        "PG"
-      ],
-      "stats": {
-        "PTS": 17.4,
-        "REB": 5.0,
-        "AST": 2.3,
-        "ST": 1.9,
-        "BLK": 0.7,
-        "3PTM": 3.4,
-        "FG%": 0.483,
-        "FT%": 0.721,
-        "TO": 0.9
-      }
-    },
-    {
-      "player_id": "1130",
-      "name": "Malik Booker",
-      "nba_team": "OKC",
-      "positions": [
-        "SG"
-      ],
-      "stats": {
-        "PTS": 19.8,
-        "REB": 8.1,
-        "AST": 1.7,
-        "ST": 1.4,
-        "BLK": 1.4,
-        "3PTM": 2.3,
-        "FG%": 0.434,
-        "FT%": 0.806,
-        "TO": 3.0
-      }
-    },
-    {
-      "player_id": "1131",
-      "name": "Jaylen Ellis",
-      "nba_team": "BOS",
-      "positions": [
-        "PG"
-      ],
-      "stats": {
-        "PTS": 7.8,
-        "REB": 11.5,
-        "AST": 7.2,
-        "ST": 0.8,
-        "BLK": 0.6,
-        "3PTM": 2.2,
-        "FG%": 0.497,
-        "FT%": 0.658,
-        "TO": 2.9
-      }
-    },
-    {
-      "player_id": "1132",
-      "name": "Kobe Grant",
-      "nba_team": "IND",
-      "positions": [
-        "PF"
-      ],
-      "stats": {
-        "PTS": 11.4,
-        "REB": 10.1,
-        "AST": 4.2,
-        "ST": 1.1,
-        "BLK": 1.6,
-        "3PTM": 0.9,
-        "FG%": 0.468,
-        "FT%": 0.766,
-        "TO": 1.6
-      }
-    },
-    {
-      "player_id": "1133",
-      "name": "Devin Moss",
-      "nba_team": "MIA",
-      "positions": [
-        "SF"
-      ],
-      "stats": {
-        "PTS": 27.5,
-        "REB": 3.3,
-        "AST": 4.0,
-        "ST": 1.3,
-        "BLK": 0.8,
-        "3PTM": 1.9,
-        "FG%": 0.447,
-        "FT%": 0.712,
-        "TO": 0.9
-      }
-    },
-    {
-      "player_id": "1134",
-      "name": "Isaiah Rowe",
-      "nba_team": "PHI",
-      "positions": [
-        "SG"
-      ],
-      "stats": {
-        "PTS": 27.2,
-        "REB": 11.0,
-        "AST": 7.5,
-        "ST": 1.9,
-        "BLK": 1.6,
-        "3PTM": 1.0,
-        "FG%": 0.432,
-        "FT%": 0.899,
-        "TO": 1.9
-      }
-    },
-    {
-      "player_id": "1135",
-      "name": "Isaiah Ware",
-      "nba_team": "LAL",
-      "positions": [
-        "PG"
-      ],
-      "stats": {
-        "PTS": 26.8,
-        "REB": 7.1,
-        "AST": 8.7,
-        "ST": 0.7,
-        "BLK": 0.9,
-        "3PTM": 0.6,
-        "FG%": 0.479,
-        "FT%": 0.871,
-        "TO": 2.3
-      }
-    },
-    {
-      "player_id": "1136",
-      "name": "Xavier Grant",
-      "nba_team": "LAL",
-      "positions": [
-        "PG"
-      ],
-      "stats": {
-        "PTS": 15.5,
-        "REB": 10.8,
-        "AST": 6.8,
-        "ST": 1.6,
-        "BLK": 0.9,
-        "3PTM": 1.7,
-        "FG%": 0.49,
-        "FT%": 0.699,
-        "TO": 2.1
-      }
-    },
-    {
-      "player_id": "1137",
-      "name": "Andre Rowe",
-      "nba_team": "CLE",
-      "positions": [
-        "C"
-      ],
-      "stats": {
-        "PTS": 12.2,
-        "REB": 11.9,
-        "AST": 6.4,
-        "ST": 0.6,
-        "BLK": 2.2,
-        "3PTM": 1.7,
-        "FG%": 0.521,
-        "FT%": 0.735,
-        "TO": 3.0
-      }
-    },
-    {
-      "player_id": "1138",
-      "name": "Devin Hayes",
-      "nba_team": "SAC",
-      "positions": [
-        "C"
-      ],
-      "stats": {
-        "PTS": 6.9,
-        "REB": 2.4,
-        "AST": 6.7,
-        "ST": 1.7,
-        "BLK": 1.2,
-        "3PTM": 0.9,
-        "FG%": 0.535,
-        "FT%": 0.685,
-        "TO": 3.0
-      }
-    },
-    {
-      "player_id": "1139",
-      "name": "Jaylen Ford",
-      "nba_team": "SAC",
-      "positions": [
-        "C"
-      ],
-      "stats": {
-        "PTS": 22.3,
-        "REB": 5.0,
-        "AST": 3.7,
-        "ST": 1.7,
-        "BLK": 1.3,
-        "3PTM": 2.7,
-        "FG%": 0.452,
-        "FT%": 0.854,
-        "TO": 1.6
-      }
-    },
-    {
-      "player_id": "1140",
-      "name": "Tyrus Sharp",
-      "nba_team": "IND",
-      "positions": [
-        "PG"
-      ],
-      "stats": {
-        "PTS": 19.1,
-        "REB": 4.7,
-        "AST": 6.2,
-        "ST": 2.0,
-        "BLK": 1.4,
-        "3PTM": 1.1,
-        "FG%": 0.417,
-        "FT%": 0.77,
-        "TO": 2.0
-      }
-    },
-    {
-      "player_id": "1141",
-      "name": "Nate Rowe",
-      "nba_team": "PHX",
-      "positions": [
-        "SG"
-      ],
-      "stats": {
-        "PTS": 6.7,
-        "REB": 11.5,
-        "AST": 1.9,
+        "PTS": 12.3,
+        "REB": 6.8,
+        "AST": 1.4,
         "ST": 0.4,
-        "BLK": 0.8,
-        "3PTM": 0.9,
-        "FG%": 0.507,
-        "FT%": 0.753,
-        "TO": 2.6
-      }
-    },
-    {
-      "player_id": "1142",
-      "name": "Xavier Vance",
-      "nba_team": "PHX",
-      "positions": [
-        "C"
-      ],
-      "stats": {
-        "PTS": 10.6,
-        "REB": 5.3,
-        "AST": 6.3,
-        "ST": 1.2,
-        "BLK": 0.8,
-        "3PTM": 1.0,
-        "FG%": 0.538,
-        "FT%": 0.736,
-        "TO": 1.6
-      }
-    },
-    {
-      "player_id": "1143",
-      "name": "Trey Frazier",
-      "nba_team": "NOP",
-      "positions": [
-        "SG"
-      ],
-      "stats": {
-        "PTS": 27.1,
-        "REB": 4.8,
-        "AST": 3.4,
-        "ST": 1.9,
-        "BLK": 2.2,
-        "3PTM": 2.9,
-        "FG%": 0.509,
-        "FT%": 0.823,
-        "TO": 1.9
-      }
-    },
-    {
-      "player_id": "1144",
-      "name": "Xavier Poole",
-      "nba_team": "OKC",
-      "positions": [
-        "SF"
-      ],
-      "stats": {
-        "PTS": 8.7,
-        "REB": 8.8,
-        "AST": 4.0,
-        "ST": 2.0,
         "BLK": 1.8,
-        "3PTM": 3.5,
-        "FG%": 0.523,
-        "FT%": 0.723,
-        "TO": 1.4
+        "TO": 1.2,
+        "3PTM": 0.0,
+        "FG%": 0.702,
+        "FT%": 0.689
       }
     },
     {
-      "player_id": "1145",
-      "name": "Andre Poole",
-      "nba_team": "CLE",
-      "positions": [
-        "SF"
-      ],
+      "player_id": "1642264",
+      "name": "Stephon Castle",
+      "nba_team": "SAS",
+      "positions": [],
       "stats": {
-        "PTS": 22.4,
-        "REB": 4.1,
-        "AST": 7.6,
-        "ST": 0.8,
-        "BLK": 1.3,
-        "3PTM": 1.3,
-        "FG%": 0.425,
-        "FT%": 0.835,
-        "TO": 1.3
+        "PTS": 14.7,
+        "REB": 3.7,
+        "AST": 4.1,
+        "ST": 0.9,
+        "BLK": 0.3,
+        "TO": 2.2,
+        "3PTM": 1.2,
+        "FG%": 0.428,
+        "FT%": 0.724
       }
     },
     {
-      "player_id": "1146",
-      "name": "Marcus Young",
-      "nba_team": "NYK",
-      "positions": [
-        "SG"
-      ],
+      "player_id": "1627736",
+      "name": "Malik Beasley",
+      "nba_team": "DET",
+      "positions": [],
       "stats": {
-        "PTS": 7.2,
-        "REB": 6.1,
-        "AST": 6.7,
-        "ST": 0.6,
-        "BLK": 1.7,
-        "3PTM": 0.4,
-        "FG%": 0.487,
-        "FT%": 0.882,
-        "TO": 1.7
+        "PTS": 16.3,
+        "REB": 2.6,
+        "AST": 1.7,
+        "ST": 0.9,
+        "BLK": 0.1,
+        "TO": 1.0,
+        "3PTM": 3.9,
+        "FG%": 0.43,
+        "FT%": 0.679
       }
     },
     {
-      "player_id": "1147",
-      "name": "Xavier Ware",
-      "nba_team": "MIN",
-      "positions": [
-        "SF"
-      ],
+      "player_id": "1631097",
+      "name": "Bennedict Mathurin",
+      "nba_team": "IND",
+      "positions": [],
+      "stats": {
+        "PTS": 16.1,
+        "REB": 5.3,
+        "AST": 1.9,
+        "ST": 0.7,
+        "BLK": 0.3,
+        "TO": 1.9,
+        "3PTM": 1.4,
+        "FG%": 0.458,
+        "FT%": 0.831
+      }
+    },
+    {
+      "player_id": "1626156",
+      "name": "D'Angelo Russell",
+      "nba_team": "BKN",
+      "positions": [],
+      "stats": {
+        "PTS": 12.6,
+        "REB": 2.8,
+        "AST": 5.1,
+        "ST": 1.0,
+        "BLK": 0.4,
+        "TO": 1.9,
+        "3PTM": 1.9,
+        "FG%": 0.39,
+        "FT%": 0.834
+      }
+    },
+    {
+      "player_id": "203932",
+      "name": "Aaron Gordon",
+      "nba_team": "DEN",
+      "positions": [],
+      "stats": {
+        "PTS": 14.7,
+        "REB": 4.8,
+        "AST": 3.2,
+        "ST": 0.5,
+        "BLK": 0.3,
+        "TO": 1.4,
+        "3PTM": 1.5,
+        "FG%": 0.531,
+        "FT%": 0.81
+      }
+    },
+    {
+      "player_id": "1641764",
+      "name": "Brandin Podziemski",
+      "nba_team": "GSW",
+      "positions": [],
+      "stats": {
+        "PTS": 11.7,
+        "REB": 5.1,
+        "AST": 3.4,
+        "ST": 1.1,
+        "BLK": 0.2,
+        "TO": 1.2,
+        "3PTM": 1.8,
+        "FG%": 0.445,
+        "FT%": 0.758
+      }
+    },
+    {
+      "player_id": "203471",
+      "name": "Dennis Schr\u00f6der",
+      "nba_team": "DET",
+      "positions": [],
       "stats": {
         "PTS": 13.1,
-        "REB": 8.5,
-        "AST": 8.3,
+        "REB": 2.6,
+        "AST": 5.4,
+        "ST": 0.9,
+        "BLK": 0.2,
+        "TO": 1.9,
+        "3PTM": 1.7,
+        "FG%": 0.406,
+        "FT%": 0.838
+      }
+    },
+    {
+      "player_id": "1628978",
+      "name": "Donte DiVincenzo",
+      "nba_team": "MIN",
+      "positions": [],
+      "stats": {
+        "PTS": 11.7,
+        "REB": 3.7,
+        "AST": 3.6,
+        "ST": 1.2,
+        "BLK": 0.3,
+        "TO": 1.6,
+        "3PTM": 2.8,
+        "FG%": 0.422,
+        "FT%": 0.778
+      }
+    },
+    {
+      "player_id": "1630228",
+      "name": "Jonathan Kuminga",
+      "nba_team": "GSW",
+      "positions": [],
+      "stats": {
+        "PTS": 15.3,
+        "REB": 4.6,
+        "AST": 2.2,
+        "ST": 0.8,
+        "BLK": 0.4,
+        "TO": 1.5,
+        "3PTM": 1.0,
+        "FG%": 0.454,
+        "FT%": 0.668
+      }
+    },
+    {
+      "player_id": "201950",
+      "name": "Jrue Holiday",
+      "nba_team": "BOS",
+      "positions": [],
+      "stats": {
+        "PTS": 11.1,
+        "REB": 4.3,
+        "AST": 3.9,
+        "ST": 1.1,
+        "BLK": 0.4,
+        "TO": 1.2,
+        "3PTM": 1.7,
+        "FG%": 0.443,
+        "FT%": 0.909
+      }
+    },
+    {
+      "player_id": "1628398",
+      "name": "Kyle Kuzma",
+      "nba_team": "MIL",
+      "positions": [],
+      "stats": {
+        "PTS": 14.8,
+        "REB": 5.7,
+        "AST": 2.3,
+        "ST": 0.6,
+        "BLK": 0.3,
+        "TO": 2.2,
+        "3PTM": 1.5,
+        "FG%": 0.436,
+        "FT%": 0.634
+      }
+    },
+    {
+      "player_id": "1630245",
+      "name": "Ayo Dosunmu",
+      "nba_team": "CHI",
+      "positions": [],
+      "stats": {
+        "PTS": 12.3,
+        "REB": 3.5,
+        "AST": 4.5,
+        "ST": 0.9,
+        "BLK": 0.4,
+        "TO": 1.5,
+        "3PTM": 1.3,
+        "FG%": 0.492,
+        "FT%": 0.785
+      }
+    },
+    {
+      "player_id": "1641726",
+      "name": "Dereck Lively II",
+      "nba_team": "DAL",
+      "positions": [],
+      "stats": {
+        "PTS": 8.7,
+        "REB": 7.5,
+        "AST": 2.4,
+        "ST": 0.6,
+        "BLK": 1.6,
+        "TO": 1.1,
+        "3PTM": 0.0,
+        "FG%": 0.702,
+        "FT%": 0.63
+      }
+    },
+    {
+      "player_id": "1630703",
+      "name": "Scoot Henderson",
+      "nba_team": "POR",
+      "positions": [],
+      "stats": {
+        "PTS": 12.7,
+        "REB": 3.0,
+        "AST": 5.1,
+        "ST": 1.0,
+        "BLK": 0.2,
+        "TO": 2.7,
+        "3PTM": 1.6,
+        "FG%": 0.419,
+        "FT%": 0.767
+      }
+    },
+    {
+      "player_id": "1630529",
+      "name": "Herbert Jones",
+      "nba_team": "NOP",
+      "positions": [],
+      "stats": {
+        "PTS": 10.3,
+        "REB": 3.9,
+        "AST": 3.3,
+        "ST": 1.9,
+        "BLK": 0.5,
+        "TO": 1.8,
+        "3PTM": 1.1,
+        "FG%": 0.436,
+        "FT%": 0.825
+      }
+    },
+    {
+      "player_id": "1630230",
+      "name": "Naji Marshall",
+      "nba_team": "DAL",
+      "positions": [],
+      "stats": {
+        "PTS": 13.2,
+        "REB": 4.8,
+        "AST": 3.0,
+        "ST": 1.0,
+        "BLK": 0.2,
+        "TO": 1.6,
+        "3PTM": 0.9,
+        "FG%": 0.508,
+        "FT%": 0.813
+      }
+    },
+    {
+      "player_id": "202691",
+      "name": "Klay Thompson",
+      "nba_team": "DAL",
+      "positions": [],
+      "stats": {
+        "PTS": 14.0,
+        "REB": 3.4,
+        "AST": 2.0,
+        "ST": 0.7,
+        "BLK": 0.4,
+        "TO": 1.2,
+        "3PTM": 3.0,
+        "FG%": 0.412,
+        "FT%": 0.905
+      }
+    },
+    {
+      "player_id": "1631095",
+      "name": "Jabari Smith Jr.",
+      "nba_team": "HOU",
+      "positions": [],
+      "stats": {
+        "PTS": 12.2,
+        "REB": 7.0,
+        "AST": 1.1,
+        "ST": 0.4,
+        "BLK": 0.7,
+        "TO": 1.1,
+        "3PTM": 1.7,
+        "FG%": 0.438,
+        "FT%": 0.825
+      }
+    },
+    {
+      "player_id": "1627747",
+      "name": "Caris LeVert",
+      "nba_team": "ATL",
+      "positions": [],
+      "stats": {
+        "PTS": 12.1,
+        "REB": 3.2,
+        "AST": 3.4,
+        "ST": 0.9,
+        "BLK": 0.5,
+        "TO": 1.2,
+        "3PTM": 1.7,
+        "FG%": 0.467,
+        "FT%": 0.71
+      }
+    },
+    {
+      "player_id": "1629060",
+      "name": "Rui Hachimura",
+      "nba_team": "LAL",
+      "positions": [],
+      "stats": {
+        "PTS": 13.1,
+        "REB": 5.0,
+        "AST": 1.4,
+        "ST": 0.8,
+        "BLK": 0.4,
+        "TO": 0.8,
+        "3PTM": 1.7,
+        "FG%": 0.509,
+        "FT%": 0.77
+      }
+    },
+    {
+      "player_id": "1641709",
+      "name": "Ausar Thompson",
+      "nba_team": "DET",
+      "positions": [],
+      "stats": {
+        "PTS": 10.1,
+        "REB": 5.1,
+        "AST": 2.3,
+        "ST": 1.7,
+        "BLK": 0.7,
+        "TO": 1.4,
+        "3PTM": 0.2,
+        "FG%": 0.535,
+        "FT%": 0.641
+      }
+    },
+    {
+      "player_id": "1631110",
+      "name": "Jeremy Sochan",
+      "nba_team": "SAS",
+      "positions": [],
+      "stats": {
+        "PTS": 11.4,
+        "REB": 6.5,
+        "AST": 2.4,
+        "ST": 0.8,
+        "BLK": 0.5,
+        "TO": 1.6,
+        "3PTM": 0.5,
+        "FG%": 0.535,
+        "FT%": 0.696
+      }
+    },
+    {
+      "player_id": "203114",
+      "name": "Khris Middleton",
+      "nba_team": "WAS",
+      "positions": [],
+      "stats": {
+        "PTS": 11.9,
+        "REB": 3.7,
+        "AST": 4.1,
+        "ST": 0.9,
+        "BLK": 0.2,
+        "TO": 1.5,
+        "3PTM": 1.3,
+        "FG%": 0.475,
+        "FT%": 0.857
+      }
+    },
+    {
+      "player_id": "1628415",
+      "name": "Dillon Brooks",
+      "nba_team": "HOU",
+      "positions": [],
+      "stats": {
+        "PTS": 14.0,
+        "REB": 3.7,
+        "AST": 1.7,
+        "ST": 0.8,
+        "BLK": 0.2,
+        "TO": 1.0,
+        "3PTM": 2.5,
+        "FG%": 0.429,
+        "FT%": 0.818
+      }
+    },
+    {
+      "player_id": "1630631",
+      "name": "Jose Alvarado",
+      "nba_team": "NOP",
+      "positions": [],
+      "stats": {
+        "PTS": 10.3,
+        "REB": 2.4,
+        "AST": 4.6,
+        "ST": 1.3,
+        "BLK": 0.3,
+        "TO": 1.5,
+        "3PTM": 2.0,
+        "FG%": 0.392,
+        "FT%": 0.811
+      }
+    },
+    {
+      "player_id": "1642274",
+      "name": "Yves Missi",
+      "nba_team": "NOP",
+      "positions": [],
+      "stats": {
+        "PTS": 9.1,
+        "REB": 8.2,
+        "AST": 1.4,
         "ST": 0.5,
         "BLK": 1.3,
+        "TO": 1.1,
+        "3PTM": 0.0,
+        "FG%": 0.547,
+        "FT%": 0.623
+      }
+    },
+    {
+      "player_id": "1641711",
+      "name": "Gradey Dick",
+      "nba_team": "TOR",
+      "positions": [],
+      "stats": {
+        "PTS": 14.4,
+        "REB": 3.6,
+        "AST": 1.8,
+        "ST": 0.9,
+        "BLK": 0.2,
+        "TO": 1.5,
         "3PTM": 2.1,
-        "FG%": 0.511,
-        "FT%": 0.884,
-        "TO": 3.0
+        "FG%": 0.41,
+        "FT%": 0.858
       }
     },
     {
-      "player_id": "1148",
-      "name": "Cody Sharp",
-      "nba_team": "GSW",
-      "positions": [
-        "PG"
-      ],
+      "player_id": "201143",
+      "name": "Al Horford",
+      "nba_team": "BOS",
+      "positions": [],
       "stats": {
-        "PTS": 27.9,
-        "REB": 6.0,
-        "AST": 5.0,
-        "ST": 1.9,
-        "BLK": 2.1,
-        "3PTM": 3.4,
-        "FG%": 0.533,
-        "FT%": 0.652,
-        "TO": 2.1
-      }
-    },
-    {
-      "player_id": "1149",
-      "name": "Tyrus Moss",
-      "nba_team": "IND",
-      "positions": [
-        "PF"
-      ],
-      "stats": {
-        "PTS": 27.8,
-        "REB": 7.4,
-        "AST": 5.0,
-        "ST": 1.9,
-        "BLK": 1.9,
+        "PTS": 9.0,
+        "REB": 6.2,
+        "AST": 2.1,
+        "ST": 0.6,
+        "BLK": 0.9,
+        "TO": 0.8,
         "3PTM": 1.9,
-        "FG%": 0.437,
-        "FT%": 0.678,
-        "TO": 1.1
+        "FG%": 0.423,
+        "FT%": 0.895
       }
     },
     {
-      "player_id": "1150",
-      "name": "Brandon Diaz",
-      "nba_team": "GSW",
-      "positions": [
-        "PG"
-      ],
+      "player_id": "1641744",
+      "name": "Zach Edey",
+      "nba_team": "MEM",
+      "positions": [],
       "stats": {
-        "PTS": 22.2,
-        "REB": 9.9,
-        "AST": 5.5,
-        "ST": 1.6,
+        "PTS": 9.2,
+        "REB": 8.3,
+        "AST": 1.0,
+        "ST": 0.5,
+        "BLK": 1.3,
+        "TO": 1.3,
+        "3PTM": 0.3,
+        "FG%": 0.58,
+        "FT%": 0.709
+      }
+    },
+    {
+      "player_id": "1630590",
+      "name": "Scotty Pippen Jr.",
+      "nba_team": "MEM",
+      "positions": [],
+      "stats": {
+        "PTS": 9.9,
+        "REB": 3.3,
+        "AST": 4.4,
+        "ST": 1.3,
+        "BLK": 0.4,
+        "TO": 1.7,
+        "3PTM": 1.1,
+        "FG%": 0.48,
+        "FT%": 0.713
+      }
+    },
+    {
+      "player_id": "1626145",
+      "name": "Tyus Jones",
+      "nba_team": "PHX",
+      "positions": [],
+      "stats": {
+        "PTS": 10.2,
+        "REB": 2.4,
+        "AST": 5.3,
+        "ST": 0.9,
+        "BLK": 0.1,
+        "TO": 1.1,
+        "3PTM": 2.0,
+        "FG%": 0.448,
+        "FT%": 0.895
+      }
+    },
+    {
+      "player_id": "203994",
+      "name": "Jusuf Nurki\u0107",
+      "nba_team": "CHA",
+      "positions": [],
+      "stats": {
+        "PTS": 8.9,
+        "REB": 7.8,
+        "AST": 2.3,
+        "ST": 0.8,
+        "BLK": 0.7,
+        "TO": 1.9,
+        "3PTM": 0.6,
+        "FG%": 0.477,
+        "FT%": 0.664
+      }
+    },
+    {
+      "player_id": "1642272",
+      "name": "Jared McCain",
+      "nba_team": "PHI",
+      "positions": [],
+      "stats": {
+        "PTS": 15.3,
+        "REB": 2.4,
+        "AST": 2.6,
+        "ST": 0.7,
+        "BLK": 0.0,
+        "TO": 1.6,
+        "3PTM": 2.2,
+        "FG%": 0.46,
+        "FT%": 0.875
+      }
+    },
+    {
+      "player_id": "1629614",
+      "name": "Andrew Nembhard",
+      "nba_team": "IND",
+      "positions": [],
+      "stats": {
+        "PTS": 10.0,
+        "REB": 3.3,
+        "AST": 5.0,
+        "ST": 1.2,
+        "BLK": 0.2,
+        "TO": 1.7,
+        "3PTM": 0.8,
+        "FG%": 0.458,
+        "FT%": 0.794
+      }
+    },
+    {
+      "player_id": "203991",
+      "name": "Clint Capela",
+      "nba_team": "ATL",
+      "positions": [],
+      "stats": {
+        "PTS": 8.9,
+        "REB": 8.5,
+        "AST": 1.1,
+        "ST": 0.6,
+        "BLK": 1.0,
+        "TO": 0.9,
+        "3PTM": 0.0,
+        "FG%": 0.559,
+        "FT%": 0.536
+      }
+    },
+    {
+      "player_id": "1627763",
+      "name": "Malcolm Brogdon",
+      "nba_team": "WAS",
+      "positions": [],
+      "stats": {
+        "PTS": 12.7,
+        "REB": 3.8,
+        "AST": 4.1,
+        "ST": 0.5,
+        "BLK": 0.2,
+        "TO": 1.6,
+        "3PTM": 0.7,
+        "FG%": 0.433,
+        "FT%": 0.88
+      }
+    },
+    {
+      "player_id": "202685",
+      "name": "Jonas Valan\u010di\u016bnas",
+      "nba_team": "SAC",
+      "positions": [],
+      "stats": {
+        "PTS": 10.4,
+        "REB": 7.7,
+        "AST": 2.0,
+        "ST": 0.5,
         "BLK": 0.6,
-        "3PTM": 3.1,
-        "FG%": 0.536,
-        "FT%": 0.857,
-        "TO": 2.0
+        "TO": 1.5,
+        "3PTM": 0.1,
+        "FG%": 0.55,
+        "FT%": 0.879
+      }
+    },
+    {
+      "player_id": "1627824",
+      "name": "Guerschon Yabusele",
+      "nba_team": "PHI",
+      "positions": [],
+      "stats": {
+        "PTS": 11.0,
+        "REB": 5.6,
+        "AST": 2.1,
+        "ST": 0.8,
+        "BLK": 0.3,
+        "TO": 1.2,
+        "3PTM": 1.5,
+        "FG%": 0.501,
+        "FT%": 0.725
       }
     }
   ]
