@@ -101,10 +101,16 @@ class SettingsPatch(BaseModel):
 _COOKIE = "session"
 
 
-def _set_session(response: Response, user_id: int) -> None:
-    # SameSite=None; Secure is required for the Vercel↔Railway cross-site cookie.
+_LOCAL_HOSTS = {"testserver", "localhost", "127.0.0.1"}
+
+
+def _set_session(response: Response, request: Request, user_id: int) -> None:
+    # SameSite=None needs Secure on real cross-site hosts (Vercel↔Railway). Over
+    # plain http (TestClient's "testserver", local dev) a Secure cookie would be
+    # dropped, so scope Secure to real hostnames.
+    secure = (request.url.hostname or "") not in _LOCAL_HOSTS
     response.set_cookie(_COOKIE, users.make_token(user_id), httponly=True,
-                        secure=True, samesite="none",
+                        secure=secure, samesite="none",
                         max_age=30 * 24 * 3600, path="/")
 
 
@@ -114,42 +120,39 @@ def _current_user(request: Request) -> dict | None:
     return users.get_user_by_id(uid) if uid else None
 
 
-def _format_for(request: Request) -> str:
-    u = _current_user(request)
-    return u["league_format"] if u else get_settings().demo_league_format
-
-
 def _load_league() -> LeagueSettings:
     return get_league_settings(LEAGUE_KEY)
 
 
-def _league_for(fmt: str) -> LeagueSettings:
-    """League settings for the requested format. In demo mode this derives the
-    settings directly (the single-league Postgres cache can't hold two formats at
-    once); live mode returns the real Yahoo league regardless of `fmt`."""
-    if get_settings().demo_mode:
+def _league_for(request: Request) -> LeagueSettings:
+    """League settings for this request. A signed-in user in demo mode gets their
+    saved format's fixture (the single-league Postgres cache can't hold two formats
+    at once); otherwise fall back to the shared league (patchable in tests / real
+    Yahoo league live)."""
+    u = _current_user(request)
+    if u and get_settings().demo_mode:
         from fantasy_gm import demo
-        return demo.demo_league_settings(fmt)
+        return demo.demo_league_settings(u["league_format"])
     return _load_league()
 
 
 @app.post("/auth/register")
-def register(creds: Credentials, response: Response) -> dict:
+def register(creds: Credentials, request: Request, response: Response) -> dict:
     if not creds.email or not creds.password:
         raise HTTPException(status_code=400, detail="Email and password required.")
     if users.get_user_by_email(creds.email):
         raise HTTPException(status_code=409, detail="Email already registered.")
     u = users.create_user(creds.email, creds.password)
-    _set_session(response, u["id"])
+    _set_session(response, request, u["id"])
     return {"email": u["email"], "league_format": u["league_format"]}
 
 
 @app.post("/auth/login")
-def login(creds: Credentials, response: Response) -> dict:
+def login(creds: Credentials, request: Request, response: Response) -> dict:
     u = users.get_user_by_email(creds.email)
     if not u or not users.verify_password(creds.password, u["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
-    _set_session(response, u["id"])
+    _set_session(response, request, u["id"])
     return {"email": u["email"], "league_format": u["league_format"]}
 
 
@@ -267,11 +270,12 @@ def _league_info() -> LeagueSettings:
 
 @app.get("/league/info")
 def league_info(request: Request) -> dict:
-    # Demo mode reflects the signed-in user's chosen format (and the fixture name);
-    # live mode fetches fresh from Yahoo so the league display name is present.
-    if get_settings().demo_mode:
+    # A signed-in user in demo mode sees their chosen format; otherwise fetch fresh
+    # from Yahoo (live) / the fixture (demo) so the league display name is present.
+    u = _current_user(request)
+    if u and get_settings().demo_mode:
         from fantasy_gm import demo
-        s = demo.demo_league_settings(_format_for(request))
+        s = demo.demo_league_settings(u["league_format"])
     else:
         s = _league_info()
     return {"name": s.name, "format": s.format, "format_label": s.format_label}
@@ -285,7 +289,7 @@ def league_teams() -> dict:
 
 @app.get("/analytics/dashboard")
 def dashboard(request: Request) -> dict:
-    league = _league_for(_format_for(request))
+    league = _league_for(request)
     teams = _all_teams()
     mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
     fas = _free_agents()
@@ -333,7 +337,7 @@ def trade_history() -> dict:
 @app.post("/trade/analyze")
 def trade_analyze(req: TradeRequest, request: Request) -> dict:
     _guard(request)
-    league = _league_for(_format_for(request))
+    league = _league_for(request)
     byid = _players_by_id(req.give + req.get)
     give = [byid[i] for i in req.give if i in byid]
     get = [byid[i] for i in req.get if i in byid]
@@ -356,7 +360,7 @@ def trade_analyze(req: TradeRequest, request: Request) -> dict:
 @app.post("/chat")
 def chat(req: ChatRequest, request: Request) -> StreamingResponse:
     _guard(request)
-    agent = build_agent(league=_league_for(_format_for(request)), league_key=LEAGUE_KEY,
+    agent = build_agent(league=_league_for(request), league_key=LEAGUE_KEY,
                         my_team_key=MY_TEAM_KEY, model=_make_model(),
                         checkpointer=_checkpointer)
 
