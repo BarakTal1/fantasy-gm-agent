@@ -175,3 +175,27 @@ def test_league_info_endpoint(monkeypatch):
     body = TestClient(api.app).get("/league/info").json()
     assert body == {"name": "My Real League", "format": "points",
                     "format_label": "Points"}
+
+
+def test_chat_rate_limited(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.ratelimit import RateLimiter
+    from fantasy_gm.schemas import LeagueSettings
+    from langchain_core.messages import AIMessage
+    monkeypatch.setattr(api, "_claude_limiter",
+                        RateLimiter(max_requests=1, window_seconds=60))
+    monkeypatch.setattr(api, "_load_league",
+                        lambda: LeagueSettings(league_key="k", format="category"))
+    monkeypatch.setattr(api, "_make_model", lambda: object())
+
+    class SpyAgent:
+        def stream(self, *a, **k):
+            return iter([("updates", {"agent": {"messages": [AIMessage(content="ok")]}})])
+    monkeypatch.setattr(api, "build_agent", lambda **kw: SpyAgent())
+
+    from fastapi.testclient import TestClient
+    c = TestClient(api.app)
+    r1 = c.post("/chat", json={"message": "hi", "conversation_id": "a"})
+    r2 = c.post("/chat", json={"message": "hi", "conversation_id": "a"})
+    assert r1.status_code == 200
+    assert r2.status_code == 429

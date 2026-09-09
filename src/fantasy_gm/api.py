@@ -3,7 +3,7 @@ import os
 from contextlib import asynccontextmanager
 from datetime import date
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from langchain_anthropic import ChatAnthropic
@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from fantasy_gm import analytics, trade
 from fantasy_gm.agent import build_agent
 from fantasy_gm.config import get_settings
+from fantasy_gm.ratelimit import RateLimiter
 from fantasy_gm.schemas import LeagueSettings
 from fantasy_gm.tools import (
     get_all_teams,
@@ -59,6 +60,15 @@ app.add_middleware(
 # Single-user demo config — replace with real values / auth in a multi-user build.
 LEAGUE_KEY = "428.l.123456"
 MY_TEAM_KEY = "428.l.123456.t.1"
+
+# ~20 Claude-backed requests per 10 min per IP — generous for a reviewer, caps abuse.
+_claude_limiter = RateLimiter(max_requests=20, window_seconds=600)
+
+
+def _guard(request: Request) -> None:
+    ip = request.client.host if request.client else "unknown"
+    if not _claude_limiter.allow(ip):
+        raise HTTPException(status_code=429, detail="Rate limit reached — try again shortly.")
 
 
 class ChatRequest(BaseModel):
@@ -203,7 +213,8 @@ def dashboard() -> dict:
 
 
 @app.post("/trade/analyze")
-def trade_analyze(req: TradeRequest) -> dict:
+def trade_analyze(req: TradeRequest, request: Request) -> dict:
+    _guard(request)
     league = _load_league()
     byid = _players_by_id(req.give + req.get)
     give = [byid[i] for i in req.give if i in byid]
@@ -225,7 +236,8 @@ def trade_analyze(req: TradeRequest) -> dict:
 
 
 @app.post("/chat")
-def chat(req: ChatRequest) -> StreamingResponse:
+def chat(req: ChatRequest, request: Request) -> StreamingResponse:
+    _guard(request)
     agent = build_agent(league=_load_league(), league_key=LEAGUE_KEY,
                         my_team_key=MY_TEAM_KEY, model=_make_model(),
                         checkpointer=_checkpointer)
