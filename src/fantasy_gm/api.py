@@ -53,6 +53,9 @@ if os.getenv("FRONTEND_ORIGIN"):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_ALLOWED_ORIGINS,
+    # Allow the Vercel frontend (production + preview deploys) without depending
+    # on an exact FRONTEND_ORIGIN env match (trailing slash / preview-hash safe).
+    allow_origin_regex=r"https://fantasy-gm-agent.*\.vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
 )
