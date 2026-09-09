@@ -61,7 +61,16 @@ def seed_snapshots() -> None:
     print(f"seeded {n} player_stat_snapshots for {len(players)} players")
 
 
+def clear_league_config() -> None:
+    # The league_config cache pins the league format (category/points). Clearing
+    # it on each (re)deploy makes get_league_settings re-derive from the current
+    # DEMO_LEAGUE_FORMAT env, so switching the demo format takes effect on redeploy.
+    execute("DELETE FROM league_config")
+    print("cleared league_config cache")
+
+
 if __name__ == "__main__":
+    clear_league_config()
     seed_schedule()
     seed_snapshots()
     print("demo data seeded.")
