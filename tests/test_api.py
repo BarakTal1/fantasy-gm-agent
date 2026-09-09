@@ -178,10 +178,11 @@ def test_league_info_endpoint(monkeypatch):
 
 
 def test_chat_rate_limited(monkeypatch):
+    from langchain_core.messages import AIMessage
+
     from fantasy_gm import api
     from fantasy_gm.ratelimit import RateLimiter
     from fantasy_gm.schemas import LeagueSettings
-    from langchain_core.messages import AIMessage
     monkeypatch.setattr(api, "_claude_limiter",
                         RateLimiter(max_requests=1, window_seconds=60))
     monkeypatch.setattr(api, "_load_league",
