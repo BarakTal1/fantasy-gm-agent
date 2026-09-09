@@ -1,35 +1,51 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* Lightning — "Kinetic Amber Precision" design tokens (warm; light + dark). */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Fira+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  --font: 'Inter', system-ui, sans-serif;
-  --primary: #2563EB; --primary-hover: #1D4ED8; --on-primary: #FFFFFF;
-  --indigo: #6366F1; --accent: #059669;
-  --bg: #FFFFFF; --surface: #F1F5FD; --surface-2: #FFFFFF;
-  --text: #0F172A; --muted: #475569; --border: #E4ECFC;
-  --danger: #DC2626; --ring: #2563EB;
-  --radius: 14px; --radius-sm: 10px;
-  --shadow: 0 1px 2px rgba(15,23,42,.06), 0 4px 16px rgba(15,23,42,.06);
+  --font: 'Fira Sans', system-ui, sans-serif;
+  --display: 'Space Grotesk', system-ui, sans-serif;
+
+  /* Electric brand */
+  --primary: #F97316; --primary-hover: #EA580C; --on-primary: #1A1512;
+  --gold: #FBBF24;
+  --grad: linear-gradient(135deg, #FBBF24 0%, #F97316 100%);
+  --glow: rgba(249, 115, 22, 0.20);
+  --accent: #16A34A; --danger: #DC2626; --ring: #F97316;
+
+  /* Warm light mode (cream sand) */
+  --bg: #FFF8F1; --surface: #FDF3E7; --surface-2: #FFFFFF;
+  --text: #1C1917; --muted: #78716C; --border: #F0E4D6;
+
+  --radius: 16px; --radius-sm: 12px; --radius-pill: 999px;
+  --shadow: 0 1px 2px rgba(74,45,23,.06), 0 6px 20px -4px rgba(74,45,23,.10);
+  --shadow-halo: 0 8px 24px -6px rgba(74,45,23,.14), 0 0 16px 0 var(--glow);
 }
+
+/* Warm dark mode (deep arena soot) */
 :root[data-theme="dark"] {
-  --primary: #3B82F6; --primary-hover: #60A5FA; --on-primary: #0B1220;
-  --indigo: #818CF8; --accent: #10B981;
-  --bg: #0B1220; --surface: #111A2E; --surface-2: #0F1729;
-  --text: #E5EDF7; --muted: #94A3B8; --border: #1E293B;
-  --danger: #F87171; --ring: #3B82F6;
-  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 20px rgba(0,0,0,.35);
+  --primary: #F97316; --primary-hover: #FB923C; --on-primary: #1A1512;
+  --gold: #FBBF24; --glow: rgba(249, 115, 22, 0.24);
+  --accent: #22C55E; --danger: #F87171; --ring: #FB923C;
+  --bg: #1A1512; --surface: #241C17; --surface-2: #2F241E;
+  --text: #F5EDE4; --muted: #A89F91; --border: #3A2E26;
+  --shadow: 0 4px 20px -2px rgba(10,7,5,.5);
+  --shadow-halo: 0 8px 24px -4px rgba(10,7,5,.6), 0 0 16px 0 var(--glow);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --primary: #3B82F6; --primary-hover: #60A5FA; --on-primary: #0B1220;
-    --indigo: #818CF8; --accent: #10B981;
-    --bg: #0B1220; --surface: #111A2E; --surface-2: #0F1729;
-    --text: #E5EDF7; --muted: #94A3B8; --border: #1E293B;
-    --danger: #F87171; --ring: #3B82F6;
-    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 20px rgba(0,0,0,.35);
+    --primary: #F97316; --primary-hover: #FB923C; --on-primary: #1A1512;
+    --gold: #FBBF24; --glow: rgba(249, 115, 22, 0.24);
+    --accent: #22C55E; --danger: #F87171; --ring: #FB923C;
+    --bg: #1A1512; --surface: #241C17; --surface-2: #2F241E;
+    --text: #F5EDE4; --muted: #A89F91; --border: #3A2E26;
+    --shadow: 0 4px 20px -2px rgba(10,7,5,.5);
+    --shadow-halo: 0 8px 24px -4px rgba(10,7,5,.6), 0 0 16px 0 var(--glow);
   }
 }
+
 * { box-sizing: border-box; }
-body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); }
+body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text);
+  font-feature-settings: "tnum" 1, "lnum" 1; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }

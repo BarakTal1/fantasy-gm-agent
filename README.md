@@ -1,4 +1,4 @@
-# Fantasy GM Agent
+# ⚡ Lightning — Fantasy GM
 
 A conversational AI assistant for NBA fantasy basketball. Ask it things like *"who should I pick up this week?"* or *"is this trade fair?"* and it reasons over your live Yahoo Fantasy league data — roster needs, recent player form, and how many games each player has this week — to give justified recommendations.
 
