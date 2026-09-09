@@ -58,6 +58,24 @@ describe("DashboardView", () => {
     expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
   });
 
+  it("renders the weekday coverage card with a thin-day hint", async () => {
+    vi.spyOn(api, "getDashboard").mockResolvedValue({
+      format: "points", schedule: {}, buy_low_sell_high: [],
+      recommended_pickups: [{ player_id: "3", name: "Add Me", nba_team: "BOS", games: 3,
+                              score: 12, drop: null }],
+      points_value_board: [],
+    });
+    vi.spyOn(api, "getWeekdays").mockResolvedValue({ days: [
+      { day: "Mon", count: 6, weak: false }, { day: "Tue", count: 5, weak: false },
+      { day: "Wed", count: 1, weak: true }, { day: "Thu", count: 5, weak: false },
+      { day: "Fri", count: 5, weak: false }, { day: "Sat", count: 5, weak: false },
+      { day: "Sun", count: 1, weak: true },
+    ] });
+    render(<DashboardView />);
+    expect(await screen.findByText(/games this week by day/i)).toBeInTheDocument();
+    expect(screen.getByText(/thin on Wed & Sun/i)).toBeInTheDocument();
+  });
+
   it("shows an empty state when there are no recommendations", async () => {
     vi.spyOn(api, "getDashboard").mockResolvedValue({
       format: "points",

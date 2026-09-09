@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { getDashboard } from "../lib/api";
+import { getDashboard, getWeekdays } from "../lib/api";
+import type { WeekdayCoverage } from "../lib/api";
 import { RadarChart } from "../components/charts/RadarChart";
 import { BarList } from "../components/charts/BarList";
 import { DivergingList } from "../components/charts/DivergingList";
 import { GamesHeatmap } from "../components/charts/GamesHeatmap";
+import { WeekdayBars } from "../components/charts/WeekdayBars";
 import { ErrorBanner } from "../components/ErrorBanner";
 
 interface RecommendedPickup {
@@ -61,6 +63,7 @@ function RecommendedPickups({ items }: { items: RecommendedPickup[] }) {
 
 export function DashboardView() {
   const [data, setData] = useState<DashboardPayload | null>(null);
+  const [weekdays, setWeekdays] = useState<WeekdayCoverage[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = () => {
@@ -69,6 +72,7 @@ export function DashboardView() {
     getDashboard()
       .then((d) => setData(d))
       .catch((e) => setError(String(e)));
+    getWeekdays().then((w) => setWeekdays(w.days)).catch(() => setWeekdays(null));
   };
 
   useEffect(load, []);
@@ -102,6 +106,7 @@ export function DashboardView() {
       <div className="dashboard">
         <BarList title="Points value board" items={pointsItems} />
         <RecommendedPickups items={data.recommended_pickups} />
+        {weekdays && <WeekdayBars days={weekdays} />}
         <GamesHeatmap games={data.schedule} />
       </div>
     );
@@ -125,6 +130,7 @@ export function DashboardView() {
       <RecommendedPickups items={data.recommended_pickups} />
       <BarList title="Streaming board" items={streamingItems} />
       <DivergingList items={divergingItems} />
+      {weekdays && <WeekdayBars days={weekdays} />}
       <GamesHeatmap games={data.schedule} />
     </div>
   );

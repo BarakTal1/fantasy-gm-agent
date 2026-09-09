@@ -4,6 +4,7 @@ const TABS = [
   { to: "/", label: "Chat" },
   { to: "/dashboard", label: "Dashboard" },
   { to: "/trade", label: "Trade" },
+  { to: "/history", label: "History" },
 ];
 
 export function Nav() {
