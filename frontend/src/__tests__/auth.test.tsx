@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import * as api from "../lib/api";
@@ -29,7 +29,9 @@ describe("auth", () => {
     await userEvent.click(signIn);
     await userEvent.type(screen.getByLabelText(/email/i), "me@x.com");
     await userEvent.type(screen.getByLabelText(/password/i), "secret1");
-    await userEvent.click(screen.getByRole("button", { name: /^sign in$/i }));
+    // The header also has a "Sign in" button, so scope to the modal's submit.
+    const dialog = screen.getByRole("dialog");
+    await userEvent.click(within(dialog).getByRole("button", { name: /^sign in$/i }));
 
     expect(await screen.findByText("me@x.com")).toBeInTheDocument();
     expect(api.login).toHaveBeenCalledWith("me@x.com", "secret1");
