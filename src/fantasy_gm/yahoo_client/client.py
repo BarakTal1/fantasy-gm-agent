@@ -55,6 +55,7 @@ def _parse_player(pdata: list) -> Player:
         nba_team=_meta(meta, "editorial_team_abbr"),
         positions=_positions(meta),
         stats={s["stat"]["stat_id"]: float(s["stat"]["value"] or 0) for s in stats},
+        image_url=_meta(meta, "image_url") or None,
     )
 
 

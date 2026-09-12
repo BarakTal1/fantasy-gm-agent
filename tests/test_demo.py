@@ -25,3 +25,12 @@ def test_demo_points_settings(monkeypatch):
     assert s.is_points
     assert s.point_weights["ST"] == 3.0
     get_settings.cache_clear()
+
+
+def test_demo_players_have_headshots():
+    from fantasy_gm import demo
+    teams = demo.demo_teams()
+    p = teams[0].players[0]
+    assert p.image_url and p.image_url.startswith("https://cdn.nba.com/headshots/")
+    fas = demo.demo_free_agents()
+    assert fas[0].image_url and fas[0].image_url.startswith("https://cdn.nba.com/")

@@ -29,8 +29,10 @@ def demo_league_settings(fmt: str | None = None) -> LeagueSettings:
 
 
 def _player(d: dict) -> Player:
+    from fantasy_gm import player_images
     return Player(player_id=d["player_id"], name=d["name"], nba_team=d["nba_team"],
-                  positions=d.get("positions", []), stats=d["stats"])
+                  positions=d.get("positions", []), stats=d["stats"],
+                  image_url=player_images.resolve_image(d["player_id"]))
 
 
 def demo_teams() -> list[Team]:
