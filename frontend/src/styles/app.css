@@ -358,7 +358,16 @@
 .weekday { font-size: 11px; font-weight: 600; color: var(--muted); }
 .weektag { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
   color: var(--danger); }
+.weekcol.heavy .weekfill { background: var(--danger); }
+.weektag.heavy { color: var(--danger); }
 .chart-hint { color: var(--muted); font-size: 13px; margin: 12px 2px 0; }
+
+/* Teams to target */
+.target-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.target-team { padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
+.target-head em { font-style: normal; color: var(--muted); margin-left: 6px; }
+.target-fas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.target-fa { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
 
 /* Trade history */
 .history { max-width: 760px; margin: 0 auto; padding: 20px 16px 60px;
