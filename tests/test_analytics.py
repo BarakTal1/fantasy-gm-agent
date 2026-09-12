@@ -39,11 +39,39 @@ def test_streaming_board_ranks_by_form_times_games():
     assert board[0]["projected"]["PTS"] == 48.0  # 12 * 4
 
 
-def test_buy_low_sell_high_flags_divergence():
+def test_buy_low_volume_only_league_flags_cold_form():
+    # No percentage cats: classification falls back to volume divergence.
     players = [_p("1", PTS=20)]
-    trends = {"1": {"PTS": 10.0}}  # cold vs season -> buy low
+    trends = {"1": {"PTS": 10.0}}          # -50% vs season -> buy_low
     res = buy_low_sell_high(players, trends, cats=["PTS"])
-    assert res[0]["signal"] == "buy_low"
+    assert res and res[0]["signal"] == "buy_low"
+    assert res[0]["efficiency_delta"] is None
+    assert res[0]["drivers"] == ["PTS below season"]
+
+
+def test_sell_high_on_hot_shooting():
+    players = [_p("1", **{"FG%": 0.40, "PTS": 20})]
+    trends = {"1": {"FG%": 0.55, "PTS": 21}}   # +15 FG pts -> regression risk
+    res = buy_low_sell_high(players, trends, cats=["FG%", "PTS"])
+    assert res and res[0]["signal"] == "sell_high"
+    assert res[0]["efficiency_delta"] > 0
+
+
+def test_buy_low_rejected_when_volume_collapsed():
+    # Cold shooting but counting volume also cratered -> opportunity gone, no buy.
+    players = [_p("1", **{"FG%": 0.50, "PTS": 20})]
+    trends = {"1": {"FG%": 0.40, "PTS": 8}}    # FG cold AND PTS -60%
+    res = buy_low_sell_high(players, trends, cats=["FG%", "PTS"])
+    assert res == []
+
+
+def test_confidence_dampens_low_sample():
+    players = [_p("1", PTS=20)]
+    trends = {"1": {"PTS": 10.0}}
+    hi = buy_low_sell_high(players, trends, cats=["PTS"], games={"1": 40})
+    lo = buy_low_sell_high(players, trends, cats=["PTS"], games={"1": 5})
+    assert hi[0]["strength"] > lo[0]["strength"]
+    assert hi[0]["confidence"] == 1.0 and lo[0]["confidence"] == 0.6
 
 
 def _team(name, players): return Team(team_key=name, name=name, players=players)
