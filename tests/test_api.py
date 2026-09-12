@@ -38,6 +38,8 @@ def test_waivers_analytics_category(monkeypatch):
     body = TestClient(api.app).get("/analytics/waivers").json()
     assert body["format"] == "category"
     assert "recommended_pickups" in body and "streaming_board" in body
+    assert len(body["weekdays"]) == 7
+    assert "teams_to_target" in body and isinstance(body["teams_to_target"], list)
 
 
 def test_league_analytics_category(monkeypatch):

@@ -325,6 +325,9 @@ def analytics_waivers(request: Request) -> dict:
     else:
         out["streaming_board"] = analytics.streaming_board(
             fas, fa_trends, games, league.categories)[:12]
+    day_teams = json.loads((_DEMO_DIR / "schedule_by_day.json").read_text())
+    out["weekdays"] = analytics.weekday_coverage(mine.players, day_teams)
+    out["teams_to_target"] = analytics.teams_to_target(mine.players, fas, day_teams, league)
     return out
 
 
