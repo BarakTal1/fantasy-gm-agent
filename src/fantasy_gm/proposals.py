@@ -127,6 +127,6 @@ def _suggest_category(my_team: Team, all_teams: list[Team], trends: dict,
 def suggest_trades(my_team: Team, all_teams: list[Team], trends: dict,
                    settings: LeagueSettings, limit: int = DEFAULT_LIMIT) -> list[dict]:
     if settings.is_points:
-        from fantasy_gm.proposals_points import suggest_points   # built in Task 3
+        from fantasy_gm.proposals_points import suggest_points  # built in Task 3
         return suggest_points(my_team, all_teams, trends, settings, limit)
     return _suggest_category(my_team, all_teams, trends, settings, limit)

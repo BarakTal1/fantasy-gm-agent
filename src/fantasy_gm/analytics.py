@@ -118,7 +118,7 @@ def buy_low_sell_high(players: list[Player], trends: dict[str, dict],
         if not form:
             continue
 
-        def d(c: str) -> float:
+        def d(c: str, form=form, p=p) -> float:
             return _divergence(form.get(c, p.stat(c)), p.stat(c), c)
 
         eff = (sum(d(c) for c in eff_cats) / len(eff_cats)) if eff_cats else None
