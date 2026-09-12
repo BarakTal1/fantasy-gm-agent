@@ -286,3 +286,44 @@ def test_trade_history_endpoint(monkeypatch):
     t0 = body["trades"][0]                 # fixture: gave Barrett, got Fox
     assert t0["got"][0]["name"] == "Fox"
     assert t0["got"][0]["after"]["PTS"] > t0["got"][0]["before"]["PTS"]
+
+
+def test_received_trades_endpoint(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.schemas import Player, Team
+    monkeypatch.setattr(api, "_all_teams", lambda: [
+        Team(team_key=api.MY_TEAM_KEY, name="Mine",
+             players=[Player(player_id="1626164", name="Booker", nba_team="PHX",
+                             stats={"PTS": 27.0})])])
+    monkeypatch.setattr(api, "_free_agents", lambda: [
+        Player(player_id="202681", name="Kyrie", nba_team="DAL", stats={"PTS": 24.0})])
+    monkeypatch.setattr(api, "_pending_offers", lambda: [
+        {"from_team": "Team 2", "date": "2026-01-20", "note": "swap",
+         "they_give": ["202681"], "they_want": ["1626164"]}])
+    body = TestClient(api.app).get("/trades/received").json()
+    assert len(body["offers"]) == 1
+    assert body["offers"][0]["they_give"][0]["name"] == "Kyrie"
+    assert body["offers"][0]["they_want"][0]["name"] == "Booker"
+
+
+def test_suggestions_endpoint(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.schemas import LeagueSettings, Player, Team
+    monkeypatch.setattr(api, "_league_for",
+        lambda request: LeagueSettings(league_key="k", format="category",
+                                       categories=["PTS", "AST"]))
+    monkeypatch.setattr(api, "_all_teams", lambda: [
+        Team(team_key=api.MY_TEAM_KEY, name="Mine",
+             players=[Player(player_id="m1", name="Scorer", nba_team="LAL",
+                             stats={"PTS": 20, "AST": 2}),
+                      Player(player_id="m2", name="Role", nba_team="LAL",
+                             stats={"PTS": 12, "AST": 3})]),
+        Team(team_key="428.l.123456.t.2", name="Rival",
+             players=[Player(player_id="r1", name="Dimer", nba_team="BOS",
+                             stats={"PTS": 6, "AST": 11})])])
+    monkeypatch.setattr(api, "_trends_for",
+        lambda ids: {"r1": {"PTS": 3, "AST": 5}})   # rival dimer cold -> buy_low
+    body = TestClient(api.app).get("/trades/suggestions").json()
+    assert body["format"] == "category"
+    assert isinstance(body["suggestions"], list)
+    assert body["suggestions"] and body["suggestions"][0]["with_team"] == "Rival"

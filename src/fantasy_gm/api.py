@@ -12,7 +12,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
 from pydantic import BaseModel
 
-from fantasy_gm import analytics, trade, trades_history, users
+from fantasy_gm import analytics, proposals, received_trades, trade, trades_history, users
 from fantasy_gm.agent import build_agent
 from fantasy_gm.config import get_settings
 from fantasy_gm.db import execute
@@ -207,6 +207,11 @@ def _players_by_id(ids: list[str]) -> dict:
     return {i: idx[i] for i in ids if i in idx}
 
 
+def _pending_offers() -> list[dict]:
+    from fantasy_gm.yahoo_client import client as yahoo_client
+    return yahoo_client.fetch_pending_trades(LEAGUE_KEY, MY_TEAM_KEY)
+
+
 def _verdict(delta, summary, give, get) -> str:
     """Single focused Claude call grounded in the computed deltas.
     `summary` is None for a points-league delta (net fantasy points); otherwise
@@ -332,6 +337,26 @@ def trade_history() -> dict:
     by_id.update({p.player_id: p for p in _free_agents()})
     trades = json.loads((_DEMO_DIR / "trade_history.json").read_text())
     return {"trades": trades_history.build_history(trades, by_id)}
+
+
+@app.get("/trades/received")
+def trades_received() -> dict:
+    """Pending trade offers other managers sent you (demo fixture / live-gated)."""
+    by_id = {p.player_id: p for t in _all_teams() for p in t.players}
+    by_id.update({p.player_id: p for p in _free_agents()})
+    return {"offers": received_trades.build_offers(_pending_offers(), by_id)}
+
+
+@app.get("/trades/suggestions")
+def trades_suggestions(request: Request) -> dict:
+    """Deterministic suggested trades to offer other teams (Claude on demand)."""
+    league = _league_for(request)
+    teams = _all_teams()
+    mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
+    ids = [p.player_id for t in teams for p in t.players]
+    trends = _trends_for(ids)
+    return {"format": league.format,
+            "suggestions": proposals.suggest_trades(mine, teams, trends, league)}
 
 
 @app.post("/trade/analyze")
