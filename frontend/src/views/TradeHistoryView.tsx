@@ -32,12 +32,9 @@ export function TradeHistoryView() {
 
   return (
     <div className="history">
-      <div className="history-head">
-        <h1>Trade history</h1>
-        <p className="settings-hint">
-          Demo trades — click a player to see their before/after. Real history connects with Yahoo.
-        </p>
-      </div>
+      <p className="settings-hint">
+        Demo trades — click a player to see their before/after. Real history connects with Yahoo.
+      </p>
       {trades.map((t, i) => (
         <section className="trade-card" key={i}>
           <header className="trade-card-head">
