@@ -213,6 +213,29 @@ def points_value_board(free_agents, trends, games, settings: LeagueSettings,
     return sorted(rows, key=lambda r: r["projected_points"], reverse=True)[:limit]
 
 
+def roster_week_outlook(roster: list[Player], trends: dict[str, dict],
+                        games: dict[str, int], settings: LeagueSettings) -> list[dict]:
+    """Per roster player: games this week, a projected-week stat line, and a
+    form tag (buy_low / sell_high / neutral) from the buy-low/sell-high engine."""
+    signal = {r["player_id"]: r["signal"]
+              for r in buy_low_sell_high(roster, trends, settings.categories)}
+    rows = []
+    for p in roster:
+        form = trends.get(p.player_id) or dict(p.stats)
+        g = games.get(p.nba_team, 0)
+        row = {"player_id": p.player_id, "name": p.name, "nba_team": p.nba_team,
+               "image_url": p.image_url, "games": g,
+               "form": signal.get(p.player_id, "neutral")}
+        if settings.is_points:
+            row["projected_points"] = round(
+                scoring.fantasy_points(form, settings.point_weights) * g, 1)
+        else:
+            row["projected"] = {c: round(form.get(c, 0.0) * g, 1)
+                                for c in settings.categories if not c.endswith("%")}
+        rows.append(row)
+    return rows
+
+
 _DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 

@@ -143,3 +143,25 @@ def test_weekday_coverage_flags_thin_days():
     assert by_day["Tue"]["count"] == 1 and by_day["Tue"]["weak"] is True
     assert by_day["Wed"]["count"] == 0 and by_day["Wed"]["weak"] is False  # no games
     assert [c["day"] for c in cov][:3] == ["Mon", "Tue", "Wed"]            # ordered
+
+
+def test_roster_week_outlook_category_projects_and_tags():
+    from fantasy_gm.analytics import roster_week_outlook
+    cat = LeagueSettings(league_key="k", format="category", categories=["PTS", "AST"])
+    roster = [_p("1", PTS=20, AST=5)]
+    trends = {"1": {"PTS": 10.0, "AST": 2.0}}        # cold vs season -> buy_low
+    games = {"LAL": 3}                                # _p defaults nba_team="LAL"
+    rows = roster_week_outlook(roster, trends, games, cat)
+    assert rows[0]["games"] == 3
+    assert rows[0]["projected"]["PTS"] == 30.0        # recent 10 * 3 games
+    assert rows[0]["form"] == "buy_low"
+
+
+def test_roster_week_outlook_points_and_neutral():
+    from fantasy_gm.analytics import roster_week_outlook
+    pts = LeagueSettings(league_key="k", format="points", categories=["PTS"],
+                         point_weights={"PTS": 1.0})
+    roster = [_p("1", PTS=20)]
+    rows = roster_week_outlook(roster, trends={}, games={"LAL": 4}, settings=pts)
+    assert rows[0]["projected_points"] == 80.0        # season 20 (no trend) * 4
+    assert rows[0]["form"] == "neutral"               # no trend -> no signal
