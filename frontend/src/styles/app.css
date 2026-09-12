@@ -171,7 +171,7 @@
   .heat { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* ===================== Lightning polish (Kinetic Amber Precision) ===================== */
+/* ===================== Lightning polish (Kinetic Verdant Precision) ===================== */
 .brand, .empty h1, .chart figcaption, .tab, .verdict-card .badge,
 .picker-label, .analyze-btn, .example, .md thead th { font-family: var(--display); }
 
@@ -181,7 +181,7 @@
   display: grid; place-items: center; box-shadow: 0 0 14px -2px var(--glow); }
 .mark svg { width: 15px; height: 15px; color: var(--on-primary); }
 
-/* Nav: glowing amber pill tabs */
+/* Nav: glowing teal pill tabs */
 .tab { border-radius: var(--radius-pill); padding: 0 16px; font-weight: 600; color: var(--muted);
   border: 1px solid transparent; transition: color .18s ease, background .18s ease, box-shadow .18s ease; }
 .tab.active { color: var(--primary); background: color-mix(in srgb, var(--primary) 14%, transparent);
@@ -198,7 +198,7 @@
   box-shadow: 0 4px 16px -5px var(--glow); }
 .bubble.assistant { border-left: 2px solid var(--primary); box-shadow: var(--shadow); }
 
-/* Tool-status chips: pill + amber running glow */
+/* Tool-status chips: pill + teal running glow */
 .chip { border-radius: var(--radius-pill); background: var(--surface-2); border: 1px solid var(--border);
   padding: 5px 11px; }
 .chip .spin { color: var(--primary); }
@@ -216,7 +216,7 @@
   box-shadow: 0 2px 12px -3px var(--glow); }
 .analyze-btn:hover:not(:disabled) { box-shadow: 0 0 20px -2px rgba(249,115,22,.45); }
 
-/* Composer: warm input + amber focus glow */
+/* Composer: warm input + teal focus glow */
 .composer textarea:focus-visible { outline: none; border-color: var(--primary);
   box-shadow: 0 0 12px rgba(249,115,22,.25); }
 
@@ -229,7 +229,7 @@
 .chart { background: var(--surface); box-shadow: var(--shadow); }
 .verdict-card { background: var(--surface); box-shadow: var(--shadow-halo); }
 
-/* Charts: amber "you" fill, dashed muted "league", gradient bars */
+/* Charts: teal "you" fill, dashed muted "league", gradient bars */
 .bfill { background: var(--grad); }
 .radar-you { fill: color-mix(in srgb, var(--primary) 28%, transparent); stroke: var(--primary); stroke-width: 2; }
 .radar-league { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 4 4; }

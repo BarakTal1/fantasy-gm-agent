@@ -1,45 +1,45 @@
-/* Lightning — "Kinetic Amber Precision" design tokens (warm; light + dark). */
+/* Lightning — "Kinetic Verdant Precision" design tokens (cool; light + dark). */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Fira+Sans:wght@400;500;600;700&display=swap');
 
 :root {
   --font: 'Fira Sans', system-ui, sans-serif;
   --display: 'Space Grotesk', system-ui, sans-serif;
 
-  /* Electric brand */
-  --primary: #F97316; --primary-hover: #EA580C; --on-primary: #1A1512;
-  --gold: #FBBF24;
-  --grad: linear-gradient(135deg, #FBBF24 0%, #F97316 100%);
-  --glow: rgba(249, 115, 22, 0.20);
-  --accent: #16A34A; --danger: #DC2626; --ring: #F97316;
+  /* Electric brand — turquoise primary, green accent, yellow highlight */
+  --primary: #14B8A6; --primary-hover: #0D9488; --on-primary: #06231F;
+  --gold: #FACC15;
+  --grad: linear-gradient(135deg, #FACC15 0%, #14B8A6 100%);
+  --glow: rgba(20, 184, 166, 0.20);
+  --accent: #16A34A; --danger: #DC2626; --ring: #14B8A6;
 
-  /* Warm light mode (cream sand) */
-  --bg: #FFF8F1; --surface: #FDF3E7; --surface-2: #FFFFFF;
-  --text: #1C1917; --muted: #78716C; --border: #F0E4D6;
+  /* Cool light mode (faint mint) */
+  --bg: #F2FBF8; --surface: #E9F6F1; --surface-2: #FFFFFF;
+  --text: #0F1F1B; --muted: #5E726C; --border: #D7ECE4;
 
   --radius: 16px; --radius-sm: 12px; --radius-pill: 999px;
-  --shadow: 0 1px 2px rgba(74,45,23,.06), 0 6px 20px -4px rgba(74,45,23,.10);
-  --shadow-halo: 0 8px 24px -6px rgba(74,45,23,.14), 0 0 16px 0 var(--glow);
+  --shadow: 0 1px 2px rgba(13,100,90,.06), 0 6px 20px -4px rgba(13,100,90,.10);
+  --shadow-halo: 0 8px 24px -6px rgba(13,100,90,.14), 0 0 16px 0 var(--glow);
 }
 
 /* Warm dark mode (deep arena soot) */
 :root[data-theme="dark"] {
-  --primary: #F97316; --primary-hover: #FB923C; --on-primary: #1A1512;
-  --gold: #FBBF24; --glow: rgba(249, 115, 22, 0.24);
-  --accent: #22C55E; --danger: #F87171; --ring: #FB923C;
-  --bg: #1A1512; --surface: #241C17; --surface-2: #2F241E;
-  --text: #F5EDE4; --muted: #A89F91; --border: #3A2E26;
-  --shadow: 0 4px 20px -2px rgba(10,7,5,.5);
-  --shadow-halo: 0 8px 24px -4px rgba(10,7,5,.6), 0 0 16px 0 var(--glow);
+  --primary: #2DD4BF; --primary-hover: #5EEAD4; --on-primary: #06231F;
+  --gold: #FACC15; --glow: rgba(45, 212, 191, 0.24);
+  --accent: #22C55E; --danger: #F87171; --ring: #2DD4BF;
+  --bg: #0E1A16; --surface: #15241F; --surface-2: #1C2F29;
+  --text: #E6F4EF; --muted: #8FA8A0; --border: #27382F;
+  --shadow: 0 4px 20px -2px rgba(5,20,16,.5);
+  --shadow-halo: 0 8px 24px -4px rgba(5,20,16,.6), 0 0 16px 0 var(--glow);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --primary: #F97316; --primary-hover: #FB923C; --on-primary: #1A1512;
-    --gold: #FBBF24; --glow: rgba(249, 115, 22, 0.24);
-    --accent: #22C55E; --danger: #F87171; --ring: #FB923C;
-    --bg: #1A1512; --surface: #241C17; --surface-2: #2F241E;
-    --text: #F5EDE4; --muted: #A89F91; --border: #3A2E26;
-    --shadow: 0 4px 20px -2px rgba(10,7,5,.5);
-    --shadow-halo: 0 8px 24px -4px rgba(10,7,5,.6), 0 0 16px 0 var(--glow);
+    --primary: #2DD4BF; --primary-hover: #5EEAD4; --on-primary: #06231F;
+    --gold: #FACC15; --glow: rgba(45, 212, 191, 0.24);
+    --accent: #22C55E; --danger: #F87171; --ring: #2DD4BF;
+    --bg: #0E1A16; --surface: #15241F; --surface-2: #1C2F29;
+    --text: #E6F4EF; --muted: #8FA8A0; --border: #27382F;
+    --shadow: 0 4px 20px -2px rgba(5,20,16,.5);
+    --shadow-halo: 0 8px 24px -4px rgba(5,20,16,.6), 0 0 16px 0 var(--glow);
   }
 }
 
