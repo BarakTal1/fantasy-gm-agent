@@ -30,8 +30,11 @@ def _weak_cats(weights: dict[str, float], cats: list[str]) -> list[str]:
 
 
 def _need_fit(give: list[Player], get: list[Player],
-              weights: dict[str, float], cats: list[str]) -> float:
-    """Need-weighted positive improvement to my categories from the swap."""
+              weights: dict[str, float], cats: list[str]) -> tuple[float, dict]:
+    """Need-weighted positive improvement to my categories from the swap.
+
+    Returns (fit, delta) so the caller can reuse the same category_delta for
+    targeted_categories instead of recomputing it (they must never diverge)."""
     delta = trade.category_delta(give, get, cats)   # get - give, per cat
     fit = 0.0
     for c in cats:
@@ -40,11 +43,14 @@ def _need_fit(give: list[Player], get: list[Player],
         gain = -delta[c] if c in scoring.NEGATIVE_CATS else delta[c]
         if gain > 0:
             fit += gain * weights.get(c, 1.0)
-    return fit
+    return fit, delta
 
 
-def _packages(assets: list[Player], targets: list[Player],
-              settings: LeagueSettings) -> list[tuple[list[Player], list[Player]]]:
+def _candidate_packages(assets: list[Player], targets: list[Player],
+                        settings: LeagueSettings) -> list[tuple[list[Player], list[Player]]]:
+    """Unfiltered give/get candidates (1-for-1, 2-for-1, 1-for-2) — callers
+    still apply need-fit and fairness filters before treating these as
+    final proposals."""
     assets = sorted(assets, key=lambda p: scoring.player_value(p, settings),
                     reverse=True)[:PKG_POOL]
     targets = sorted(targets, key=lambda p: scoring.player_value(p, settings),
@@ -76,6 +82,9 @@ def _suggest_category(my_team: Team, all_teams: list[Team], trends: dict,
         assets = list(my_team.players)
 
     proposals_out: list[dict] = []
+    # Dedupe key. The three candidate shapes (1-1, 2-1, 1-2) currently have
+    # distinct give/get sizes so they can never collide in practice — this
+    # guards against a future package shape overlapping an existing one.
     seen: set[tuple] = set()
     for team in all_teams:
         if team.team_key == my_team.team_key:
@@ -85,21 +94,21 @@ def _suggest_category(my_team: Team, all_teams: list[Team], trends: dict,
         targets = [p for p in team.players
                    if their_signals.get(p.player_id, {}).get("signal") == "buy_low"
                    and (not weak or sum(p.stat(c) for c in weak) > 0)]
-        for give, get in _packages(assets, targets, settings):
+        for give, get in _candidate_packages(assets, targets, settings):
             key = (team.team_key,
                    tuple(sorted(p.player_id for p in give)),
                    tuple(sorted(p.player_id for p in get)))
             if key in seen:
                 continue
-            fit = _need_fit(give, get, weights, cats)
+            fit, delta = _need_fit(give, get, weights, cats)
             if fit < MIN_NEED_FIT:
                 continue
-            gap = abs(_value(give, settings) - _value(get, settings))
-            tol = max(_value(give, settings), _value(get, settings), 1.0) * FAIRNESS_PCT
+            gv, tv = _value(give, settings), _value(get, settings)
+            gap = abs(gv - tv)
+            tol = max(gv, tv, 1.0) * FAIRNESS_PCT
             if gap > tol:
                 continue
             seen.add(key)
-            delta = trade.category_delta(give, get, cats)
             targeted = [c for c in weak
                         if (delta[c] > 0 if c not in scoring.NEGATIVE_CATS
                             else delta[c] < 0)]
