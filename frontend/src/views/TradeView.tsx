@@ -4,6 +4,7 @@ import {
   getReceivedTrades, getTradeSuggestions, type ReceivedOffer, type TradeSuggestion,
 } from "../lib/api";
 import { PlayerPicker } from "../components/PlayerPicker";
+import { PlayerAvatar } from "../components/PlayerAvatar";
 import { ErrorBanner } from "../components/ErrorBanner";
 import { AnalyzeTrade } from "../components/AnalyzeTrade";
 import { TradeHistoryView } from "./TradeHistoryView";
@@ -117,9 +118,17 @@ export function TradeView() {
             {o.note && <p className="offer-note">{o.note}</p>}
             <div className="offer-sides">
               <div><span className="side-label">They give</span>
-                {o.they_give.map((p) => <span key={p.player_id} className="selected-card get">{p.name}</span>)}</div>
+                {o.they_give.map((p) => (
+                  <span key={p.player_id} className="selected-card get">
+                    <PlayerAvatar name={p.name} image_url={p.image_url} size={20} /> {p.name}
+                  </span>
+                ))}</div>
               <div><span className="side-label">They want</span>
-                {o.they_want.map((p) => <span key={p.player_id} className="selected-card give">{p.name}</span>)}</div>
+                {o.they_want.map((p) => (
+                  <span key={p.player_id} className="selected-card give">
+                    <PlayerAvatar name={p.name} image_url={p.image_url} size={20} /> {p.name}
+                  </span>
+                ))}</div>
             </div>
             <AnalyzeTrade give={o.they_want.map((p) => p.player_id)}
                           get={o.they_give.map((p) => p.player_id)} />
@@ -135,9 +144,17 @@ export function TradeView() {
             <div className="offer-head"><strong>{s.with_team}</strong></div>
             <div className="offer-sides">
               <div><span className="side-label">You give</span>
-                {s.give.map((p) => <span key={p.player_id} className="selected-card give">{p.name}</span>)}</div>
+                {s.give.map((p) => (
+                  <span key={p.player_id} className="selected-card give">
+                    <PlayerAvatar name={p.name} image_url={p.image_url} size={20} /> {p.name}
+                  </span>
+                ))}</div>
               <div><span className="side-label">You get</span>
-                {s.get.map((p) => <span key={p.player_id} className="selected-card get">{p.name}</span>)}</div>
+                {s.get.map((p) => (
+                  <span key={p.player_id} className="selected-card get">
+                    <PlayerAvatar name={p.name} image_url={p.image_url} size={20} /> {p.name}
+                  </span>
+                ))}</div>
             </div>
             {s.targeted_categories.length > 0 && (
               <p className="offer-note">Targets: {s.targeted_categories.join(", ")} · fairness gap {s.fairness_gap}</p>
