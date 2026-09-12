@@ -28,10 +28,6 @@ export async function getLeagueInfo() {
   return jget("/league/info") as Promise<{ name: string; format: string; format_label: string }>;
 }
 
-export async function getDashboard() {
-  return jget("/analytics/dashboard");
-}
-
 export async function getTeams() {
   return jget("/league/teams") as Promise<{ my_team_key: string; teams: Team[] }>;
 }
@@ -107,4 +103,62 @@ export async function updateSettings(league_format: string) {
   });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json() as Promise<{ league_format: string }>;
+}
+
+// --- Analytics (subject-scoped) ---
+export interface CategoryProfile { [cat: string]: { you: number; league_avg: number } }
+export interface BuySellRow {
+  player_id: string; name: string; nba_team: string;
+  signal: "buy_low" | "sell_high"; strength: number;
+  efficiency_delta: number | null; volume_delta: number; confidence: number;
+  drivers: string[];
+}
+export interface RecommendedPickup {
+  player_id: string; name: string; nba_team: string; games: number; score: number;
+  drop: { player_id: string; name: string; value: number } | null;
+}
+
+export async function getMyTeamAnalytics() {
+  return jget("/analytics/my-team") as Promise<{
+    format: "category" | "points";
+    weekdays: WeekdayCoverage[];
+    category_profile?: CategoryProfile;
+  }>;
+}
+export async function getWaiversAnalytics() {
+  return jget("/analytics/waivers") as Promise<{
+    format: "category" | "points";
+    schedule: Record<string, number>;
+    recommended_pickups: RecommendedPickup[];
+    streaming_board?: { player_id: string; name: string; nba_team: string;
+                        games: number; projected: Record<string, number>; score: number }[];
+    points_value_board?: { player_id: string; name: string; nba_team: string;
+                           games: number; projected_points: number }[];
+  }>;
+}
+export async function getLeagueAnalytics() {
+  return jget("/analytics/league") as Promise<{
+    format: "category" | "points";
+    teams: Team[]; my_team_key: string;
+    category_profile?: CategoryProfile;
+    buy_low_sell_high: BuySellRow[];
+  }>;
+}
+
+// --- Trades: received + suggestions ---
+export interface ReceivedOffer {
+  from_team: string; date: string; note: string;
+  they_give: Player[]; they_want: Player[];
+}
+export async function getReceivedTrades() {
+  return jget("/trades/received") as Promise<{ offers: ReceivedOffer[] }>;
+}
+export interface TradeSuggestion {
+  with_team: string; give: Player[]; get: Player[];
+  targeted_categories: string[]; fairness_gap: number; need_fit: number;
+}
+export async function getTradeSuggestions() {
+  return jget("/trades/suggestions") as Promise<{
+    format: "category" | "points"; suggestions: TradeSuggestion[];
+  }>;
 }
