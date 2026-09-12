@@ -101,3 +101,30 @@ def test_points_suggestion_is_net_positive_points():
     assert out, "expected a points proposal"
     assert out[0]["need_fit"] > 0               # projected points gained
     assert out[0]["with_team"] == "Rival"
+
+
+def test_points_unfair_gain_excluded():
+    # Target's season PTS (40) is a buy-low (trend way down), but my only give
+    # player is worth just 5 season PTS -- the gain (35) is far more than
+    # FAIRNESS_PCT (25%) of the target's points (10), so the pairing must be
+    # rejected even though it would otherwise be a huge net-positive swap.
+    pts = LeagueSettings(league_key="k", format="points", categories=["PTS"],
+                         point_weights={"PTS": 1.0})
+    mine = _team("t1", "Mine", [_p("m1", PTS=5)])
+    rival = _team("t2", "Rival", [_p("r1", PTS=40)])
+    trends = {"r1": {"PTS": 15}}                 # -62.5% vs season -> buy_low
+    out = proposals.suggest_trades(mine, [mine, rival], trends, pts)
+    assert out == [], "gap (35) exceeds the 25% fairness tolerance (10)"
+
+
+def test_points_no_gain_skipped():
+    # Target's season PTS (20) is a buy-low, but my give player's season PTS
+    # (25) already exceeds it, so the swap is a net loss and must be skipped
+    # regardless of fairness.
+    pts = LeagueSettings(league_key="k", format="points", categories=["PTS"],
+                         point_weights={"PTS": 1.0})
+    mine = _team("t1", "Mine", [_p("m1", PTS=25)])
+    rival = _team("t2", "Rival", [_p("r1", PTS=20)])
+    trends = {"r1": {"PTS": 8}}                  # -60% vs season -> buy_low
+    out = proposals.suggest_trades(mine, [mine, rival], trends, pts)
+    assert out == [], "give (25) >= get (20) -- not a points gain"

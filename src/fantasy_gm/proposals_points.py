@@ -15,7 +15,7 @@ def _proj(p: Player, settings: LeagueSettings) -> float:
     # Project on SEASON stats, not the recent trend: the buy-low thesis is that a
     # slumping target regresses back up to its season baseline. `trends` is used
     # only to FLAG the target as buy-low (in suggest_points), not to value it.
-    return scoring.fantasy_points(dict(p.stats), settings.point_weights)
+    return scoring.fantasy_points(p.stats, settings.point_weights)
 
 
 def suggest_points(my_team: Team, all_teams: list[Team], trends: dict,
@@ -30,12 +30,12 @@ def suggest_points(my_team: Team, all_teams: list[Team], trends: dict,
                    if signals.get(p.player_id, {}).get("signal") == "buy_low"]
         for a in my_team.players:
             for t in targets:
-                give_pts, get_pts = _proj(a, settings), _proj(t, settings)
+                give_pts = _proj(a, settings)
+                get_pts = _proj(t, settings)
                 if get_pts <= give_pts:
                     continue
-                gap = abs(scoring.player_value(a, settings)
-                          - scoring.player_value(t, settings))
-                tol = max(scoring.player_value(t, settings), 1.0) * FAIRNESS_PCT
+                gap = get_pts - give_pts            # == need_fit in a points league; same axis
+                tol = max(get_pts, 1.0) * FAIRNESS_PCT
                 if gap > tol:
                     continue
                 out.append({
