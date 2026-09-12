@@ -44,8 +44,8 @@ export async function analyzeTrade(give: string[], get: string[]) {
   return r.json();
 }
 
-// --- Weekday coverage --- (served inside /analytics/my-team)
-export interface WeekdayCoverage { day: string; count: number; weak: boolean }
+// --- Weekday coverage --- (served inside /analytics/waivers)
+export interface WeekdayCoverage { day: string; count: number; weak: boolean; heavy: boolean }
 
 // --- Trade history ---
 export interface TradedPlayer {
@@ -116,12 +116,21 @@ export interface RecommendedPickup {
   drop: { player_id: string; name: string; value: number } | null;
 }
 
+export interface RosterOutlookRow {
+  player_id: string; name: string; nba_team: string; image_url?: string | null;
+  games: number; form: "buy_low" | "sell_high" | "neutral";
+  projected?: Record<string, number>; projected_points?: number;
+}
 export async function getMyTeamAnalytics() {
   return jget("/analytics/my-team") as Promise<{
     format: "category" | "points";
-    weekdays: WeekdayCoverage[];
+    roster: RosterOutlookRow[];
     category_profile?: CategoryProfile;
   }>;
+}
+export interface TeamTarget {
+  nba_team: string; weak_days: string[];
+  free_agents: { player_id: string; name: string; nba_team: string; image_url?: string | null }[];
 }
 export async function getWaiversAnalytics() {
   return jget("/analytics/waivers") as Promise<{
@@ -132,6 +141,8 @@ export async function getWaiversAnalytics() {
                         games: number; projected: Record<string, number>; score: number }[];
     points_value_board?: { player_id: string; name: string; nba_team: string;
                            games: number; projected_points: number }[];
+    weekdays: WeekdayCoverage[];
+    teams_to_target: TeamTarget[];
   }>;
 }
 export async function getLeagueAnalytics() {
