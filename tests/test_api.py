@@ -27,7 +27,9 @@ def test_my_team_analytics_category(monkeypatch):
     body = TestClient(api.app).get("/analytics/my-team").json()
     assert body["format"] == "category"
     assert body["category_profile"]["PTS"]["you"] == 20
-    assert len(body["weekdays"]) == 7      # weekday coverage served here now
+    assert body["roster"][0]["form"] in {"buy_low", "sell_high", "neutral"}
+    assert "games" in body["roster"][0]
+    assert "weekdays" not in body            # weekdays moved to /analytics/waivers
 
 
 def test_waivers_analytics_category(monkeypatch):

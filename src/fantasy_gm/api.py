@@ -297,9 +297,11 @@ def analytics_my_team(request: Request) -> dict:
     league = _league_for(request)
     teams = _all_teams()
     mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
-    day_teams = json.loads((_DEMO_DIR / "schedule_by_day.json").read_text())
+    games = _week_games()
+    roster_trends = _trends_for([p.player_id for p in mine.players])
     out = {"format": league.format,
-           "weekdays": analytics.weekday_coverage(mine.players, day_teams)}
+           "roster": analytics.roster_week_outlook(
+               mine.players, roster_trends, games, league)}
     if league.is_category:
         out["category_profile"] = analytics.category_profile(
             mine, teams, league.categories)
