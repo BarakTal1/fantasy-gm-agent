@@ -165,3 +165,38 @@ def test_roster_week_outlook_points_and_neutral():
     rows = roster_week_outlook(roster, trends={}, games={"LAL": 4}, settings=pts)
     assert rows[0]["projected_points"] == 80.0        # season 20 (no trend) * 4
     assert rows[0]["form"] == "neutral"               # no trend -> no signal
+
+
+def test_weekday_coverage_flags_overloaded_days():
+    from fantasy_gm.analytics import weekday_coverage
+    from fantasy_gm.schemas import Player
+    roster = [Player(player_id=str(i), name=f"P{i}", nba_team="LAL") for i in range(11)]
+    day_teams = {"Mon": ["LAL"], "Tue": ["BOS"]}
+    cov = {c["day"]: c for c in weekday_coverage(roster, day_teams)}
+    assert cov["Mon"]["count"] == 11 and cov["Mon"]["heavy"] is True
+    assert cov["Tue"]["heavy"] is False
+
+
+def test_teams_to_target_joins_thin_days_to_free_agents():
+    from fantasy_gm.analytics import teams_to_target
+    from fantasy_gm.schemas import LeagueSettings, Player
+    cat = LeagueSettings(league_key="k", format="category", categories=["PTS"])
+    roster = [Player(player_id="r1", name="Mine", nba_team="LAL", stats={"PTS": 20})]
+    day_teams = {"Wed": ["PHX"], "Fri": ["PHX", "BOS"]}
+    fas = [Player(player_id="f1", name="Sun Guy", nba_team="PHX", stats={"PTS": 15}),
+           Player(player_id="f2", name="Celtic", nba_team="BOS", stats={"PTS": 10})]
+    out = teams_to_target(roster, fas, day_teams, cat)
+    phx = next(t for t in out if t["nba_team"] == "PHX")
+    assert phx["weak_days"] == ["Wed", "Fri"]
+    assert phx["free_agents"][0]["name"] == "Sun Guy"
+    assert phx["free_agents"][0]["nba_team"] == "PHX"
+
+
+def test_teams_to_target_skips_teams_without_free_agents():
+    from fantasy_gm.analytics import teams_to_target
+    from fantasy_gm.schemas import LeagueSettings, Player
+    cat = LeagueSettings(league_key="k", format="category", categories=["PTS"])
+    roster = [Player(player_id="r1", name="Mine", nba_team="LAL")]
+    day_teams = {"Wed": ["PHX"]}
+    out = teams_to_target(roster, free_agents=[], day_teams=day_teams, settings=cat)
+    assert out == []

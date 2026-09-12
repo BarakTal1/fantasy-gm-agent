@@ -240,17 +240,53 @@ _DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 
 def weekday_coverage(roster: list[Player], day_teams: dict[str, list[str]],
-                     weak_threshold: int = 4) -> list[dict]:
+                     weak_threshold: int = 4, heavy_threshold: int = 10) -> list[dict]:
     """Per weekday: how many of my players have an NBA game that day.
 
-    Thin days (few players playing) are flagged so the manager knows which days
-    to stream a waiver-wire player into an empty slot. `day_teams` maps a weekday
-    abbrev (Mon..Sun) to the NBA teams playing that day.
+    Thin days (few players playing) are flagged to stream a waiver player in;
+    heavy days (more than heavy_threshold playing) are flagged as wasted
+    production — only ~10 roster slots start. `day_teams` maps a weekday abbrev
+    (Mon..Sun) to the NBA teams playing that day.
     """
     out = []
     for d in _DAYS:
         teams = set(day_teams.get(d, []))
         count = sum(1 for p in roster if p.nba_team in teams)
         out.append({"day": d, "count": count,
-                    "weak": len(teams) > 0 and count <= weak_threshold})
+                    "weak": len(teams) > 0 and count <= weak_threshold,
+                    "heavy": count > heavy_threshold})
+    return out
+
+
+def teams_to_target(roster: list[Player], free_agents: list[Player],
+                    day_teams: dict[str, list[str]], settings: LeagueSettings,
+                    weak_threshold: int = 4, limit_fas: int = 3) -> list[dict]:
+    """NBA teams that play on your thin weekdays, with their available free agents.
+
+    For each thin day, the teams playing that day are candidates — adding one of
+    their players fills an empty slot on that day. Teams with no available free
+    agent are skipped (nothing to add). Sorted by thin-days-covered then FA count.
+    """
+    cov = weekday_coverage(roster, day_teams, weak_threshold)
+    weak_days = [c["day"] for c in cov if c["weak"]]
+    team_days: dict[str, list[str]] = {}
+    for d in weak_days:                       # _DAYS order preserved by weekday_coverage
+        for t in day_teams.get(d, []):
+            team_days.setdefault(t, [])
+            if d not in team_days[t]:
+                team_days[t].append(d)
+    fas_by_team: dict[str, list[Player]] = {}
+    for p in free_agents:
+        fas_by_team.setdefault(p.nba_team, []).append(p)
+    out = []
+    for team, days in team_days.items():
+        fas = sorted(fas_by_team.get(team, []),
+                     key=lambda p: scoring.player_value(p, settings), reverse=True)[:limit_fas]
+        if not fas:
+            continue
+        out.append({"nba_team": team, "weak_days": days,
+                    "free_agents": [{"player_id": p.player_id, "name": p.name,
+                                     "nba_team": p.nba_team, "image_url": p.image_url}
+                                    for p in fas]})
+    out.sort(key=lambda r: (len(r["weak_days"]), len(r["free_agents"])), reverse=True)
     return out
