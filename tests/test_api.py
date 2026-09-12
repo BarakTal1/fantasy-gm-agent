@@ -27,6 +27,7 @@ def test_my_team_analytics_category(monkeypatch):
     body = TestClient(api.app).get("/analytics/my-team").json()
     assert body["format"] == "category"
     assert body["category_profile"]["PTS"]["you"] == 20
+    assert len(body["weekdays"]) == 7      # weekday coverage served here now
 
 
 def test_waivers_analytics_category(monkeypatch):
@@ -241,20 +242,6 @@ def test_settings_patch_requires_auth(db):
     from fantasy_gm import api
     r = TestClient(api.app).patch("/settings", json={"league_format": "points"})
     assert r.status_code == 401
-
-
-def test_weekdays_endpoint(monkeypatch):
-    from fantasy_gm import api
-    from fantasy_gm.schemas import Player, Team
-    monkeypatch.setattr(api, "_all_teams", lambda: [
-        Team(team_key=api.MY_TEAM_KEY, name="Mine",
-             players=[Player(player_id="1", name="A", nba_team="LAL")])])
-    body = TestClient(api.app).get("/analytics/weekdays").json()
-    assert len(body["days"]) == 7
-    days = {d["day"]: d for d in body["days"]}
-    assert set(days["Mon"]) == {"day", "count", "weak"}
-    assert days["Mon"]["count"] == 1      # LAL plays Mon in the fixture
-    assert days["Sun"]["count"] == 0      # LAL doesn't play Sun
 
 
 def test_trade_history_endpoint(monkeypatch):

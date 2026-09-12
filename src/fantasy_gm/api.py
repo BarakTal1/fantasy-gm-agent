@@ -346,14 +346,6 @@ def analytics_league(request: Request) -> dict:
     return out
 
 
-@app.get("/analytics/weekdays")
-def weekdays() -> dict:
-    """Per-weekday count of my players with an NBA game, flagging thin days."""
-    teams = _all_teams()
-    mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
-    day_teams = json.loads((_DEMO_DIR / "schedule_by_day.json").read_text())
-    return {"days": analytics.weekday_coverage(mine.players, day_teams)}
-
 
 @app.get("/trades/history")
 def trade_history() -> dict:

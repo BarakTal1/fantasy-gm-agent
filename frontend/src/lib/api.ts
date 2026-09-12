@@ -43,11 +43,8 @@ export async function analyzeTrade(give: string[], get: string[]) {
   return r.json();
 }
 
-// --- Weekday coverage ---
+// --- Weekday coverage --- (served inside /analytics/my-team)
 export interface WeekdayCoverage { day: string; count: number; weak: boolean }
-export async function getWeekdays() {
-  return jget("/analytics/weekdays") as Promise<{ days: WeekdayCoverage[] }>;
-}
 
 // --- Trade history ---
 export interface TradedPlayer {
