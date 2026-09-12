@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
-import { analyzeTrade, getTeams, type Team } from "../lib/api";
+import {
+  analyzeTrade, getTeams, type Team,
+  getReceivedTrades, getTradeSuggestions, type ReceivedOffer, type TradeSuggestion,
+} from "../lib/api";
 import { PlayerPicker } from "../components/PlayerPicker";
 import { ErrorBanner } from "../components/ErrorBanner";
+import { AnalyzeTrade } from "../components/AnalyzeTrade";
+import { TradeHistoryView } from "./TradeHistoryView";
 
 interface CategoryTradeResult {
   format: "category";
@@ -38,6 +43,14 @@ export function TradeView() {
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [result, setResult] = useState<TradeResult | null>(null);
+
+  const [offers, setOffers] = useState<ReceivedOffer[]>([]);
+  const [suggestions, setSuggestions] = useState<TradeSuggestion[]>([]);
+
+  useEffect(() => {
+    getReceivedTrades().then((d) => setOffers(d.offers)).catch(() => setOffers([]));
+    getTradeSuggestions().then((d) => setSuggestions(d.suggestions)).catch(() => setSuggestions([]));
+  }, []);
 
   const loadTeams = () => {
     setLoadError(null);
@@ -95,6 +108,46 @@ export function TradeView() {
 
   return (
     <div className="trade">
+      <section className="trade-section">
+        <h2>Trade offers received</h2>
+        {offers.length === 0 && <div className="empty">No offers right now.</div>}
+        {offers.map((o, i) => (
+          <div key={`${o.from_team}-${i}`} className="offer-card">
+            <div className="offer-head"><strong>{o.from_team}</strong> <em>{o.date}</em></div>
+            {o.note && <p className="offer-note">{o.note}</p>}
+            <div className="offer-sides">
+              <div><span className="side-label">They give</span>
+                {o.they_give.map((p) => <span key={p.player_id} className="selected-card get">{p.name}</span>)}</div>
+              <div><span className="side-label">They want</span>
+                {o.they_want.map((p) => <span key={p.player_id} className="selected-card give">{p.name}</span>)}</div>
+            </div>
+            <AnalyzeTrade give={o.they_want.map((p) => p.player_id)}
+                          get={o.they_give.map((p) => p.player_id)} />
+          </div>
+        ))}
+      </section>
+
+      <section className="trade-section">
+        <h2>Suggested trades to propose</h2>
+        {suggestions.length === 0 && <div className="empty">No strong suggestions this week.</div>}
+        {suggestions.map((s, i) => (
+          <div key={`${s.with_team}-${i}`} className="offer-card">
+            <div className="offer-head"><strong>{s.with_team}</strong></div>
+            <div className="offer-sides">
+              <div><span className="side-label">You give</span>
+                {s.give.map((p) => <span key={p.player_id} className="selected-card give">{p.name}</span>)}</div>
+              <div><span className="side-label">You get</span>
+                {s.get.map((p) => <span key={p.player_id} className="selected-card get">{p.name}</span>)}</div>
+            </div>
+            {s.targeted_categories.length > 0 && (
+              <p className="offer-note">Targets: {s.targeted_categories.join(", ")} · fairness gap {s.fairness_gap}</p>
+            )}
+            <AnalyzeTrade give={s.give.map((p) => p.player_id)}
+                          get={s.get.map((p) => p.player_id)} />
+          </div>
+        ))}
+      </section>
+
       <div className="trade-pickers">
         <PlayerPicker label="Your roster (give)" players={myTeam.players}
           selected={give} onToggle={toggleGive} />
@@ -189,6 +242,11 @@ export function TradeView() {
           </table>
         </div>
       )}
+
+      <section className="trade-section">
+        <h2>Trade history</h2>
+        <TradeHistoryView />
+      </section>
     </div>
   );
 }
