@@ -6,6 +6,7 @@ export interface Player {
   nba_team: string;
   positions?: string[];
   stats: Record<string, number>;
+  image_url?: string | null;
 }
 
 export interface Team {
