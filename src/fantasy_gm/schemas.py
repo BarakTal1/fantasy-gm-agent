@@ -7,6 +7,7 @@ class Player(BaseModel):
     nba_team: str                      # NBA team abbrev, e.g. "LAL"
     positions: list[str] = Field(default_factory=list)
     stats: dict[str, float] = Field(default_factory=dict)  # category -> per-game value
+    image_url: str | None = None       # headshot; resolved at the data boundary
 
     def stat(self, key: str) -> float:
         return self.stats.get(key, 0.0)
