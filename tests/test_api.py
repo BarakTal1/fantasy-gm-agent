@@ -2,26 +2,53 @@ from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage
 
 
-def test_dashboard_endpoint_returns_all_sections(monkeypatch):
+def _mk_category(monkeypatch):
     from fantasy_gm import api
     from fantasy_gm.schemas import LeagueSettings, Player, Team
-    monkeypatch.setattr(api, "_load_league",
-        lambda: LeagueSettings(league_key="428.l.123456", format="category",
-                               categories=["PTS", "AST"]))
+    monkeypatch.setattr(api, "_league_for",
+        lambda request: LeagueSettings(league_key="428.l.123456", format="category",
+                                       categories=["PTS", "AST"]))
     monkeypatch.setattr(api, "_all_teams",
-        lambda: [Team(team_key="428.l.123456.t.1", name="My Squad",
+        lambda: [Team(team_key=api.MY_TEAM_KEY, name="My Squad",
                       players=[Player(player_id="1", name="A", nba_team="LAL",
-                                      stats={"PTS": 20, "AST": 5})])])
+                                      stats={"PTS": 20, "AST": 5})]),
+                 Team(team_key="428.l.123456.t.2", name="Rival",
+                      players=[Player(player_id="2", name="B", nba_team="BOS",
+                                      stats={"PTS": 10, "AST": 9})])])
     monkeypatch.setattr(api, "_free_agents",
         lambda: [Player(player_id="9", name="FA", nba_team="LAL", stats={"PTS": 10})])
     monkeypatch.setattr(api, "_trends_for", lambda ids: {"9": {"PTS": 11.0}})
     monkeypatch.setattr(api, "_week_games", lambda: {"LAL": 4})
-    from fastapi.testclient import TestClient
-    body = TestClient(api.app).get("/analytics/dashboard").json()
-    assert set(body) == {"format", "category_profile", "streaming_board",
-                         "buy_low_sell_high", "schedule", "recommended_pickups"}
+
+
+def test_my_team_analytics_category(monkeypatch):
+    from fantasy_gm import api
+    _mk_category(monkeypatch)
+    body = TestClient(api.app).get("/analytics/my-team").json()
     assert body["format"] == "category"
     assert body["category_profile"]["PTS"]["you"] == 20
+
+
+def test_waivers_analytics_category(monkeypatch):
+    from fantasy_gm import api
+    _mk_category(monkeypatch)
+    body = TestClient(api.app).get("/analytics/waivers").json()
+    assert body["format"] == "category"
+    assert "recommended_pickups" in body and "streaming_board" in body
+
+
+def test_league_analytics_category(monkeypatch):
+    from fantasy_gm import api
+    _mk_category(monkeypatch)
+    body = TestClient(api.app).get("/analytics/league").json()
+    assert body["format"] == "category"
+    assert "category_profile" in body and "teams" in body
+    assert isinstance(body["buy_low_sell_high"], list)
+
+
+def test_dashboard_endpoint_removed():
+    from fantasy_gm import api
+    assert TestClient(api.app).get("/analytics/dashboard").status_code == 404
 
 
 def test_trade_analyze_returns_deltas_and_verdict(monkeypatch):
@@ -55,25 +82,6 @@ def test_league_teams_endpoint(monkeypatch):
     body = TestClient(api.app).get("/league/teams").json()
     assert body["my_team_key"] == api.MY_TEAM_KEY
     assert body["teams"][0]["players"][0]["name"] == "A"
-
-
-def test_dashboard_is_format_tagged(monkeypatch):
-    from fantasy_gm import api
-    from fantasy_gm.schemas import LeagueSettings, Player, Team
-    monkeypatch.setattr(api, "_load_league",
-        lambda: LeagueSettings(league_key="k", format="points",
-                               point_weights={"PTS": 1.0}))
-    monkeypatch.setattr(api, "_all_teams", lambda: [
-        Team(team_key=api.MY_TEAM_KEY, name="Mine",
-             players=[Player(player_id="1", name="A", nba_team="LAL", stats={"PTS": 20})])])
-    monkeypatch.setattr(api, "_free_agents", lambda: [
-        Player(player_id="9", name="FA", nba_team="LAL", stats={"PTS": 15})])
-    monkeypatch.setattr(api, "_trends_for", lambda ids: {})
-    monkeypatch.setattr(api, "_week_games", lambda: {"LAL": 4})
-    from fastapi.testclient import TestClient
-    body = TestClient(api.app).get("/analytics/dashboard").json()
-    assert body["format"] == "points"
-    assert "points_value_board" in body            # points view, not radar
 
 
 def test_chat_streams_final_answer(monkeypatch):
@@ -233,28 +241,6 @@ def test_settings_patch_requires_auth(db):
     from fantasy_gm import api
     r = TestClient(api.app).patch("/settings", json={"league_format": "points"})
     assert r.status_code == 401
-
-
-def test_dashboard_uses_signed_in_user_format(db, monkeypatch):
-    from fantasy_gm.config import get_settings
-    get_settings.cache_clear()
-    monkeypatch.setenv("DEMO_MODE", "true")
-    from fantasy_gm import api, users
-    from fantasy_gm.db import execute
-    from fantasy_gm.schemas import Player, Team
-    users.create_user("p@p.com", "pw")
-    execute("UPDATE users SET league_format='points' WHERE email='p@p.com'")
-    monkeypatch.setattr(api, "_all_teams", lambda: [
-        Team(team_key=api.MY_TEAM_KEY, name="Mine",
-             players=[Player(player_id="1", name="A", nba_team="LAL", stats={"PTS": 20})])])
-    monkeypatch.setattr(api, "_free_agents", lambda: [])
-    monkeypatch.setattr(api, "_trends_for", lambda ids: {})
-    monkeypatch.setattr(api, "_week_games", lambda: {"LAL": 4})
-    c = TestClient(api.app)
-    c.post("/auth/login", json={"email": "p@p.com", "password": "pw"})
-    body = c.get("/analytics/dashboard").json()
-    assert body["format"] == "points"
-    get_settings.cache_clear()
 
 
 def test_weekdays_endpoint(monkeypatch):

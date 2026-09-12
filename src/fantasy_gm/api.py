@@ -292,33 +292,58 @@ def league_teams() -> dict:
             "teams": [t.model_dump() for t in _all_teams()]}
 
 
-@app.get("/analytics/dashboard")
-def dashboard(request: Request) -> dict:
+@app.get("/analytics/my-team")
+def analytics_my_team(request: Request) -> dict:
+    league = _league_for(request)
+    teams = _all_teams()
+    mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
+    day_teams = json.loads((_DEMO_DIR / "schedule_by_day.json").read_text())
+    out = {"format": league.format,
+           "weekdays": analytics.weekday_coverage(mine.players, day_teams)}
+    if league.is_category:
+        out["category_profile"] = analytics.category_profile(
+            mine, teams, league.categories)
+    return out
+
+
+@app.get("/analytics/waivers")
+def analytics_waivers(request: Request) -> dict:
     league = _league_for(request)
     teams = _all_teams()
     mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
     fas = _free_agents()
     games = _week_games()
     fa_trends = _trends_for([p.player_id for p in fas])
-    roster_trends = _trends_for([p.player_id for p in mine.players])
-    common = {
-        "format": league.format,
-        "schedule": games,
-        "recommended_pickups": analytics.recommended_pickups(
-            mine, teams, fas, fa_trends, games, league),
-        "buy_low_sell_high": analytics.buy_low_sell_high(
-            mine.players + fas, {**roster_trends, **fa_trends}, league.categories)[:12]
-        if league.is_category else [],
-    }
+    out = {"format": league.format, "schedule": games,
+           "recommended_pickups": analytics.recommended_pickups(
+               mine, teams, fas, fa_trends, games, league)}
     if league.is_points:
-        common["points_value_board"] = analytics.points_value_board(
+        out["points_value_board"] = analytics.points_value_board(
             fas, fa_trends, games, league)
     else:
-        common["category_profile"] = analytics.category_profile(
-            mine, teams, league.categories)
-        common["streaming_board"] = analytics.streaming_board(
+        out["streaming_board"] = analytics.streaming_board(
             fas, fa_trends, games, league.categories)[:12]
-    return common
+    return out
+
+
+@app.get("/analytics/league")
+def analytics_league(request: Request) -> dict:
+    league = _league_for(request)
+    teams = _all_teams()
+    mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
+    fas = _free_agents()
+    roster_trends = _trends_for([p.player_id for p in mine.players])
+    fa_trends = _trends_for([p.player_id for p in fas])
+    out = {"format": league.format,
+           "teams": [t.model_dump() for t in teams],
+           "my_team_key": MY_TEAM_KEY,
+           "buy_low_sell_high": analytics.buy_low_sell_high(
+               mine.players + fas, {**roster_trends, **fa_trends},
+               league.categories)[:12] if league.is_category else []}
+    if league.is_category:
+        out["category_profile"] = analytics.category_profile(
+            mine, teams, league.categories)
+    return out
 
 
 @app.get("/analytics/weekdays")
