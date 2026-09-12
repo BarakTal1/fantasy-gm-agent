@@ -89,3 +89,15 @@ def test_pkg_pool_caps_candidate_targets():
     got_ids = {p["player_id"] for prop in out for p in prop["get"]}
     assert "r44" not in got_ids, "lowest-value target should be dropped by PKG_POOL"
     assert got_ids, "expected at least one higher-value target to survive"
+
+
+def test_points_suggestion_is_net_positive_points():
+    pts = LeagueSettings(league_key="k", format="points", categories=["PTS"],
+                         point_weights={"PTS": 1.0})
+    mine = _team("t1", "Mine", [_p("m1", PTS=18)])
+    rival = _team("t2", "Rival", [_p("r1", PTS=22)])
+    trends = {"r1": {"PTS": 11}}                 # rival star slumping -> buy_low
+    out = proposals.suggest_trades(mine, [mine, rival], trends, pts)
+    assert out, "expected a points proposal"
+    assert out[0]["need_fit"] > 0               # projected points gained
+    assert out[0]["with_team"] == "Rival"
