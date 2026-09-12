@@ -4,10 +4,11 @@ import { MemoryRouter } from "react-router-dom";
 import { Nav } from "../components/Nav";
 
 describe("Nav", () => {
-  it("renders three tabs with the active one marked", () => {
-    render(<MemoryRouter initialEntries={["/dashboard"]}><Nav /></MemoryRouter>);
-    expect(screen.getByRole("link", { name: /chat/i })).toBeInTheDocument();
-    const dash = screen.getByRole("link", { name: /dashboard/i });
-    expect(dash).toHaveAttribute("aria-current", "page");
+  it("renders the five tabs with the active one marked", () => {
+    render(<MemoryRouter initialEntries={["/my-team"]}><Nav /></MemoryRouter>);
+    for (const label of [/chat/i, /my team/i, /waivers/i, /trade/i, /league/i]) {
+      expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
+    }
+    expect(screen.getByRole("link", { name: /my team/i })).toHaveAttribute("aria-current", "page");
   });
 });

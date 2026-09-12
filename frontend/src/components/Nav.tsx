@@ -2,9 +2,10 @@ import { NavLink } from "react-router-dom";
 
 const TABS = [
   { to: "/", label: "Chat" },
-  { to: "/dashboard", label: "Dashboard" },
+  { to: "/my-team", label: "My Team" },
+  { to: "/waivers", label: "Waivers" },
   { to: "/trade", label: "Trade" },
-  { to: "/history", label: "History" },
+  { to: "/league", label: "League" },
 ];
 
 export function Nav() {

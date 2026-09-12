@@ -4,9 +4,10 @@ import { AuthProvider } from "./state/auth";
 import { Header } from "./components/Header";
 import { Nav } from "./components/Nav";
 import { ChatView } from "./views/ChatView";
-import { DashboardView } from "./views/DashboardView";
+import { MyTeamView } from "./views/MyTeamView";
+import { WaiversView } from "./views/WaiversView";
 import { TradeView } from "./views/TradeView";
-import { TradeHistoryView } from "./views/TradeHistoryView";
+import { LeagueView } from "./views/LeagueView";
 import { SettingsView } from "./views/SettingsView";
 import "./styles/tokens.css";
 import "./styles/app.css";
@@ -21,9 +22,10 @@ export default function App() {
           <Nav />
           <Routes>
             <Route path="/" element={<ChatView />} />
-            <Route path="/dashboard" element={<DashboardView />} />
+            <Route path="/my-team" element={<MyTeamView />} />
+            <Route path="/waivers" element={<WaiversView />} />
             <Route path="/trade" element={<TradeView />} />
-            <Route path="/history" element={<TradeHistoryView />} />
+            <Route path="/league" element={<LeagueView />} />
             <Route path="/settings" element={<SettingsView theme={theme} onToggle={toggle} />} />
           </Routes>
         </div>
