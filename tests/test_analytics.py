@@ -65,6 +65,38 @@ def test_buy_low_rejected_when_volume_collapsed():
     assert res == []
 
 
+def test_buy_low_on_cold_shooting_with_volume_intact():
+    # Headline success path: efficiency down, counting volume unchanged (not
+    # collapsed) -> opportunity is intact -> buy_low fires.
+    players = [_p("1", **{"FG%": 0.50, "PTS": 20})]
+    trends = {"1": {"FG%": 0.40, "PTS": 20}}   # FG cold, PTS steady
+    res = buy_low_sell_high(players, trends, cats=["FG%", "PTS"])
+    assert res and res[0]["signal"] == "buy_low"
+    assert res[0]["efficiency_delta"] < 0
+
+
+def test_3pm_folds_into_efficiency():
+    # 3PM is a shooting-proxy counting cat and should be treated as an
+    # efficiency category (via _EFF_EXTRA), not a volume category.
+    players = [_p("1", **{"3PM": 1.0})]
+    trends = {"1": {"3PM": 2.5}}
+    res = buy_low_sell_high(players, trends, cats=["3PM"])
+    assert res and res[0]["signal"] == "sell_high"
+    assert res[0]["efficiency_delta"] is not None
+
+
+def test_drivers_labels_turnover_improvement_correctly():
+    # Fewer TOs than season is a *positive* (sell_high) signal; drivers must
+    # surface it using the same signed contribution the main loop applies for
+    # NEGATIVE_CATS, not the raw (unflipped) divergence which would exclude or
+    # mislabel it.
+    players = [_p("1", TO=5)]
+    trends = {"1": {"TO": 1.0}}   # -80% TO -> fewer turnovers -> sell_high
+    res = buy_low_sell_high(players, trends, cats=["TO"])
+    assert res and res[0]["signal"] == "sell_high"
+    assert res[0]["drivers"] == ["TO below season"]
+
+
 def test_confidence_dampens_low_sample():
     players = [_p("1", PTS=20)]
     trends = {"1": {"PTS": 10.0}}

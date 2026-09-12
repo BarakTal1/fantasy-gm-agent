@@ -82,15 +82,22 @@ def _confidence(games: int | None) -> float:
 
 
 def _drivers(p: Player, form: dict, ordered_cats: list[str], signal: str) -> list[str]:
-    """Top-2 categories moving the signal, as human-readable strings."""
+    """Top-2 categories moving the signal, as human-readable strings.
+
+    Relevance/ranking use the same signed contribution the main loop uses (the
+    NEGATIVE_CATS sign flip, so fewer TOs than season counts as a positive/
+    sell_high-direction contribution, not a "TO above season" mislabel). The
+    displayed word still reflects the actual stat movement (above/below season).
+    """
     scored = []
     for c in ordered_cats:
         dv = _divergence(form.get(c, p.stat(c)), p.stat(c), c)
+        contrib = -dv if c in scoring.NEGATIVE_CATS else dv
         above = dv > 0
-        # sell_high cares about cats above season; buy_low about cats below.
-        relevant = above if signal == "sell_high" else not above
-        if relevant and dv != 0:
-            scored.append((abs(dv), c, "above" if above else "below"))
+        # sell_high cares about cats contributing positively; buy_low, negatively.
+        relevant = (contrib > 0) if signal == "sell_high" else (contrib < 0)
+        if relevant and contrib != 0:
+            scored.append((abs(contrib), c, "above" if above else "below"))
     scored.sort(reverse=True)
     return [f"{c} {word} season" for _, c, word in scored[:2]]
 
@@ -127,13 +134,13 @@ def buy_low_sell_high(players: list[Player], trends: dict[str, dict],
 
         if primary >= SIGNAL_THRESHOLD:
             signal = "sell_high"
-            strength = (conf * (W_EFF * max(eff or 0.0, 0.0) + W_VOL * max(vol, 0.0))
+            strength = (conf * (W_EFF * max(eff, 0.0) + W_VOL * max(vol, 0.0))
                         if eff_cats else conf * abs(vol))
         elif primary <= -SIGNAL_THRESHOLD:
             if eff_cats and vol < -VOL_FLOOR:
                 continue                      # opportunity collapsed -> don't buy
             signal = "buy_low"
-            strength = (conf * (W_EFF * abs(eff or 0.0) + W_VOL * abs(min(vol, 0.0)))
+            strength = (conf * (W_EFF * abs(eff) + W_VOL * abs(min(vol, 0.0)))
                         if eff_cats else conf * abs(vol))
         else:
             continue
