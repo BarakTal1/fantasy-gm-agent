@@ -10,6 +10,7 @@ Add two trade features and reorganize the UI around them:
 2. **Suggested trades** — a deterministic league scan that proposes packages you could offer, targeting **buy-low** players who fill your **weak categories** while giving up **sell-high / surplus** players. Small packages (up to 2 players/side) allowed. Each shows targeted weak categories + fairness gap, plus an **Analyze** button for the Claude verdict.
 3. **Improve `buy_low / sell_high`** into a research-grounded formula (below), used both by the League analytics view and as the targeting backbone for suggested trades.
 4. **Reorganize the frontend into 5 tabs:** Chat · My Team · Waivers · Trade · League (retiring the single Dashboard tab and the standalone History tab).
+5. **Re-theme the UI** from warm amber/orange to a cool **turquoise / green / yellow** palette (token swap in one file).
 
 ## Non-goals (YAGNI)
 
@@ -193,6 +194,35 @@ Existing dashboard chart components (radar, ranked bars, diverging list, games h
 
 ---
 
+## Component 6 — Re-theme: turquoise / green / yellow (`frontend/src/styles/tokens.css`)
+
+Swap the "Kinetic Amber Precision" warm palette for a cool **turquoise-primary / green-accent / yellow-highlight** scheme. Almost entirely a value swap in `tokens.css` (the app is fully token-driven); the few hardcoded warm-brown tints in `--grad`, `--glow`, and the `--shadow` rgba values shift to cool teal. `--danger` stays red. Backgrounds shift to **cool-tinted neutrals** (faint mint/teal) to match.
+
+**Decisions locked:** turquoise is the dominant/primary brand color (buttons, links, logo bolt, active tab); green is the secondary accent; yellow powers highlights and the hero gradient; neutrals get a faint cool tint.
+
+| Token | Role | Light | Dark |
+|---|---|---|---|
+| `--primary` | turquoise (brand) | `#14B8A6` | `#2DD4BF` |
+| `--primary-hover` | | `#0D9488` | `#5EEAD4` |
+| `--on-primary` | text on primary | `#06231F` | `#06231F` |
+| `--accent` | green | `#16A34A` | `#22C55E` |
+| `--gold` | yellow | `#FACC15` | `#FACC15` |
+| `--grad` | hero gradient | `linear-gradient(135deg, #FACC15 0%, #14B8A6 100%)` | same |
+| `--glow` | brand glow | `rgba(20,184,166,.20)` | `rgba(45,212,191,.24)` |
+| `--ring` | focus ring | `#14B8A6` | `#2DD4BF` |
+| `--danger` | | `#DC2626` | `#F87171` |
+| `--bg` | page bg | `#F2FBF8` | `#0E1A16` |
+| `--surface` | card bg | `#E9F6F1` | `#15241F` |
+| `--surface-2` | raised bg | `#FFFFFF` | `#1C2F29` |
+| `--text` | | `#0F1F1B` | `#E6F4EF` |
+| `--muted` | | `#5E726C` | `#8FA8A0` |
+| `--border` | | `#D7ECE4` | `#27382F` |
+| `--shadow` tints | brown → teal | `rgba(13,100,90,.08/.12)` | cool dark `rgba(5,20,16,.5/.6)` |
+
+Fonts, radii, and structure are unchanged. The theme comment/name is updated (e.g. "Kinetic Verdant Precision"). The existing light/dark token blocks and the `prefers-color-scheme` block are all updated in lockstep (the dark values are currently duplicated across `[data-theme="dark"]` and the media query — both get the same new values). Contrast of text on `--primary`/`--gold` is verified to stay AA.
+
+**Confirmed scope:** a grep of `frontend/src` found **no hardcoded amber hexes** outside `tokens.css` — every component reads `var(--*)` tokens, so the swap is isolated to the one file. The logo is an inline `<Zap fill="currentColor">` icon (inherits `--primary`), and `hero.png` is an orphan asset (not referenced anywhere), so there are no baked-in raster colors to replace. Stale "amber" wording in `app.css` comments is updated to match, but those are comments only — no behavior change.
+
 ## Data flow (Analyze on a received/suggested trade)
 
 ```
@@ -220,6 +250,6 @@ User clicks Analyze on a card
 
 1. **Backend trade features** — improved `buy_low_sell_high`; `received_trades.py` + fixture + endpoint; `proposals.py` + endpoint; live-gated Yahoo `pending_trades` parser. Tests.
 2. **Analytics endpoint split** — three subject endpoints; remove `/analytics/dashboard`. Tests.
-3. **Frontend 5-tab reorg** — new Nav; My Team / Waivers / League views (relocated charts); expanded Trade tab with received + suggested sections + shared Analyze flow; `api.ts` updates. Tests.
+3. **Frontend 5-tab reorg + re-theme** — new Nav; My Team / Waivers / League views (relocated charts); expanded Trade tab with received + suggested sections + shared Analyze flow; `api.ts` updates; the `tokens.css` palette swap (Component 6). Tests. (The theme swap is independent of the other frontend work and can land first or last within this phase.)
 
 Each phase leaves the app runnable and tests green before the next.
