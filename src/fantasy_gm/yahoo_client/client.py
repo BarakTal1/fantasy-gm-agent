@@ -101,6 +101,53 @@ def _positions(meta_list: list[dict]) -> list[str]:
     return []
 
 
+def parse_pending_trades(raw: dict[str, Any], my_team_key: str) -> list[dict]:
+    """Pending trades where *I* am the recipient, in received_trades' offer shape.
+
+    NOTE (approval-gated): validated against a spec-shaped synthetic fixture
+    (tests/fixtures/pending_trades_yahoo.json); re-verify against real Yahoo
+    `transactions;types=pending` JSON once API access is granted.
+    """
+    league = raw["fantasy_content"]["league"]
+    txns = league[1].get("transactions", {})
+    offers: list[dict] = []
+    for key, node in txns.items():
+        if key == "count":
+            continue
+        txn = node["transaction"]
+        meta = txn[0]
+        if meta.get("type") != "pending_trade":
+            continue
+        if meta.get("tradee_team_key") != my_team_key:
+            continue                          # only offers sent TO me
+        they_give, they_want = [], []
+        players_node = txn[1].get("players", {})
+        for pk, pnode in players_node.items():
+            if pk == "count":
+                continue
+            pdata = pnode["player"]
+            pid = _meta(pdata[0], "player_id")
+            tdata = pdata[1].get("transaction_data", [{}])[0]
+            if tdata.get("destination_team_key") == my_team_key:
+                they_give.append(pid)         # coming to me
+            elif tdata.get("source_team_key") == my_team_key:
+                they_want.append(pid)         # leaving me
+        offers.append({"from_team": meta.get("trader_team_key", ""),
+                       "date": meta.get("timestamp", ""), "note": "",
+                       "they_give": they_give, "they_want": they_want})
+    return offers
+
+
+def fetch_pending_trades(league_key: str, my_team_key: str) -> list[dict]:
+    if _demo_mode():
+        import json
+        from pathlib import Path
+        demo_dir = Path(__file__).resolve().parents[3] / "demo_data"
+        return json.loads((demo_dir / "pending_trades.json").read_text())
+    raw = _get(f"league/{league_key}/transactions;types=pending")
+    return parse_pending_trades(raw, my_team_key)
+
+
 # Live fetch wrappers (used by sync/tools; not unit-tested against the network).
 # In demo mode they read local fixtures instead of calling the (approval-gated)
 # Yahoo API — the bridge until real access is granted.
