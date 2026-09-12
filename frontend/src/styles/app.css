@@ -393,6 +393,17 @@
 .avatar-fallback { display: inline-grid; place-items: center; font-size: 13px;
   font-weight: 700; color: var(--on-primary); background: var(--primary); }
 
+.roster-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.roster-card { display: flex; align-items: center; gap: 12px; padding: 8px 10px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
+.roster-main { flex: 1; min-width: 0; }
+.roster-name { font-weight: 600; } .roster-name em { font-style: normal; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.roster-proj { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.form-tag { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-pill); white-space: nowrap; }
+.form-buy_low { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.form-sell_high { color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); }
+.form-neutral { color: var(--muted); background: color-mix(in srgb, var(--muted) 14%, transparent); }
+
 @media (max-width: 560px) {
   .trade-sides { grid-template-columns: 1fr; }
   .trade-arrow { transform: rotate(90deg); justify-self: center; }

@@ -4,15 +4,27 @@ import * as api from "../lib/api";
 import { MyTeamView } from "../views/MyTeamView";
 
 describe("MyTeamView", () => {
-  it("renders my category profile and weekday coverage", async () => {
+  it("renders per-player cards (form tag + projected) then the radar", async () => {
     vi.spyOn(api, "getMyTeamAnalytics").mockResolvedValue({
       format: "category",
-      weekdays: [{ day: "Mon", count: 5, weak: false }, { day: "Tue", count: 2, weak: true }],
-      category_profile: { PTS: { you: 110, league_avg: 100 }, AST: { you: 20, league_avg: 25 } },
+      roster: [{ player_id: "1", name: "Devin Booker", nba_team: "PHX",
+        image_url: null, games: 4, form: "sell_high", projected: { PTS: 120, AST: 20 } }],
+      category_profile: { PTS: { you: 110, league_avg: 100 } },
     });
     render(<MyTeamView />);
-    expect((await screen.findAllByText(/PTS/)).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Mon/).length).toBeGreaterThan(0);
+    expect(await screen.findByText(/Devin Booker/)).toBeInTheDocument();
+    expect(screen.getByText(/sell high/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/PTS/).length).toBeGreaterThan(0);  // projected + radar
+  });
+
+  it("renders projected points for points leagues", async () => {
+    vi.spyOn(api, "getMyTeamAnalytics").mockResolvedValue({
+      format: "points",
+      roster: [{ player_id: "1", name: "A B", nba_team: "LAL",
+        image_url: null, games: 3, form: "neutral", projected_points: 99 }],
+    });
+    render(<MyTeamView />);
+    expect(await screen.findByText("99", { exact: false })).toBeInTheDocument();
   });
 
   it("shows an error state with retry on failure", async () => {
