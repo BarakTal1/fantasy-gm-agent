@@ -32,21 +32,36 @@ export function LeagueView() {
     signal: r.signal,
   }));
 
+  // Column order comes from the first team's stat keys (server orders by the
+  // league's categories / core box score).
+  const statCols = data.team_stats[0] ? Object.keys(data.team_stats[0].stats) : [];
+  const fmtStat = (c: string, v: number) => (c.endsWith("%") ? v.toFixed(3) : v);
+
   return (
     <div className="dashboard">
       <figure className="chart">
-        <figcaption>League teams</figcaption>
+        <figcaption>League teams — season per-game totals</figcaption>
         <table className="delta-table">
-          <thead><tr><th>Team</th><th>Players</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Team</th><th>GP</th>
+              {statCols.map((c) => <th key={c}>{c}</th>)}
+            </tr>
+          </thead>
           <tbody>
-            {data.teams.map((t) => (
+            {data.team_stats.map((t) => (
               <tr key={t.team_key} className={t.team_key === data.my_team_key ? "good" : ""}>
                 <td>{t.name}{t.team_key === data.my_team_key && <em> (you)</em>}</td>
-                <td>{t.players.length}</td>
+                <td>{t.games_week}</td>
+                {statCols.map((c) => <td key={c}>{fmtStat(c, t.stats[c])}</td>)}
               </tr>
             ))}
           </tbody>
         </table>
+        <p className="chart-hint">
+          Counting stats sum across the roster; FG%/FT% average. GP = total games
+          your players' NBA teams play this week.
+        </p>
       </figure>
 
       {divergingItems.length > 0 && (

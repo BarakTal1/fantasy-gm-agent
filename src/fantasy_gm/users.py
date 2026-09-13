@@ -4,12 +4,15 @@ Optional/additive auth — the app stays browsable in demo mode without an accou
 signing in adds a per-user row (currently just a saved league format).
 """
 import datetime as dt
+import json
 
 import bcrypt
 import jwt
 
 from fantasy_gm.config import get_settings
 from fantasy_gm.db import execute, fetch_one
+
+_USER_COLS = "id, email, password_hash, league_format, league_config"
 
 _ALG = "HS256"
 _MAX_PW_BYTES = 72  # bcrypt only hashes the first 72 bytes
@@ -47,10 +50,15 @@ def create_user(email: str, password: str) -> dict:
 
 
 def get_user_by_email(email: str) -> dict | None:
-    return fetch_one("SELECT id, email, password_hash, league_format "
-                     "FROM users WHERE email=%s", (email.lower(),))
+    return fetch_one(f"SELECT {_USER_COLS} FROM users WHERE email=%s", (email.lower(),))
 
 
 def get_user_by_id(uid: int) -> dict | None:
-    return fetch_one("SELECT id, email, password_hash, league_format "
-                     "FROM users WHERE id=%s", (uid,))
+    return fetch_one(f"SELECT {_USER_COLS} FROM users WHERE id=%s", (uid,))
+
+
+def set_league_config(uid: int, config: dict, league_format: str) -> None:
+    """Persist a user's full manual league config, mirroring the format into the
+    legacy league_format column so the older /settings path stays consistent."""
+    execute("UPDATE users SET league_config=%s, league_format=%s WHERE id=%s",
+            (json.dumps(config), league_format, uid))

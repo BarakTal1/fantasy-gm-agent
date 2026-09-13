@@ -14,6 +14,12 @@ describe("LeagueView", () => {
         { team_key: "t2", name: "Rival",
           players: [{ player_id: "2", name: "B", nba_team: "BOS", stats: { PTS: 10 } }] },
       ],
+      team_stats: [
+        { team_key: "t1", name: "Mine", players: 1, games_week: 4,
+          stats: { PTS: 20, REB: 5 } },
+        { team_key: "t2", name: "Rival", players: 1, games_week: 3,
+          stats: { PTS: 10, REB: 8 } },
+      ],
       category_profile: { PTS: { you: 20, league_avg: 15 } },
       buy_low_sell_high: [
         { player_id: "2", name: "Cold Star", nba_team: "BOS", signal: "buy_low",

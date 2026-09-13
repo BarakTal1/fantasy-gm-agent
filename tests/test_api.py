@@ -304,3 +304,58 @@ def test_suggestions_endpoint(monkeypatch):
     assert body["format"] == "category"
     assert isinstance(body["suggestions"], list)
     assert body["suggestions"] and body["suggestions"][0]["with_team"] == "Rival"
+
+
+def test_league_config_get_and_put_roundtrip(db):
+    from fantasy_gm import api
+    c = TestClient(api.app)
+    c.post("/auth/register", json={"email": "cfg@x.com", "password": "pw"})
+
+    got = c.get("/settings/league")
+    assert got.status_code == 200
+    body = got.json()
+    assert body["format"] in {"category", "points"}
+    assert "categories" in body["options"] and body["yahoo_connected"] is False
+
+    saved = c.put("/settings/league", json={
+        "name": "My Custom League", "format": "category",
+        "categories": ["PTS", "REB", "AST"], "roster_slots": {"PG": 2, "C": 1}})
+    assert saved.status_code == 200
+    out = saved.json()
+    assert out["name"] == "My Custom League"
+    assert out["categories"] == ["PTS", "REB", "AST"]
+    assert out["source"] == "manual"
+
+    # Persisted: a fresh GET reflects the manual config, and the header/info uses it.
+    assert c.get("/settings/league").json()["name"] == "My Custom League"
+    assert c.get("/league/info").json()["name"] == "My Custom League"
+
+
+def test_league_config_put_validates(db):
+    from fantasy_gm import api
+    c = TestClient(api.app)
+    c.post("/auth/register", json={"email": "v@x.com", "password": "pw"})
+    bad_fmt = c.put("/settings/league", json={"format": "bogus"})
+    assert bad_fmt.status_code == 400
+    no_cats = c.put("/settings/league", json={"format": "category", "categories": []})
+    assert no_cats.status_code == 400
+    no_weights = c.put("/settings/league",
+                       json={"format": "points", "point_weights": {}})
+    assert no_weights.status_code == 400
+
+
+def test_league_config_requires_auth(db):
+    from fantasy_gm import api
+    c = TestClient(api.app)
+    assert c.get("/settings/league").status_code == 401
+    assert c.put("/settings/league", json={"format": "category",
+                                           "categories": ["PTS"]}).status_code == 401
+
+
+def test_sync_yahoo_falls_back_when_not_connected(db):
+    from fantasy_gm import api
+    c = TestClient(api.app)
+    c.post("/auth/register", json={"email": "sync@x.com", "password": "pw"})
+    r = c.post("/settings/league/sync-yahoo")
+    assert r.status_code == 409
+    assert "connect" in r.json()["detail"].lower()

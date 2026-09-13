@@ -224,7 +224,7 @@ def roster_week_outlook(roster: list[Player], trends: dict[str, dict],
         form = trends.get(p.player_id) or dict(p.stats)
         g = games.get(p.nba_team, 0)
         row = {"player_id": p.player_id, "name": p.name, "nba_team": p.nba_team,
-               "image_url": p.image_url, "games": g,
+               "image_url": p.image_url, "positions": p.positions, "games": g,
                "form": signal.get(p.player_id, "neutral")}
         if settings.is_points:
             row["projected_points"] = round(
@@ -233,6 +233,75 @@ def roster_week_outlook(roster: list[Player], trends: dict[str, dict],
             row["projected"] = {c: round(form.get(c, 0.0) * g, 1)
                                 for c in settings.categories if not c.endswith("%")}
         rows.append(row)
+    return rows
+
+
+# Standard NBA fantasy position slots, in display order.
+POSITIONS = ["PG", "SG", "SF", "PF", "C"]
+
+
+def best_player(roster: list[Player], settings: LeagueSettings) -> dict | None:
+    """The single most valuable player on the roster under this league's scoring."""
+    if not roster:
+        return None
+    top = max(roster, key=lambda p: scoring.player_value(p, settings))
+    return {"player_id": top.player_id, "name": top.name, "nba_team": top.nba_team,
+            "positions": top.positions, "image_url": top.image_url,
+            "value": round(scoring.player_value(top, settings), 1)}
+
+
+def position_strengths(roster: list[Player], settings: LeagueSettings) -> list[dict]:
+    """Total & average player value grouped by eligible position (a multi-eligible
+    player counts toward each of its positions). Sorted strongest total first, so
+    the caller can read the top row as the roster's strongest position group."""
+    groups: dict[str, dict] = {}
+    for p in roster:
+        v = scoring.player_value(p, settings)
+        for pos in (p.positions or ["UTIL"]):
+            g = groups.setdefault(pos, {"position": pos, "count": 0, "total_value": 0.0})
+            g["count"] += 1
+            g["total_value"] += v
+    rows = [{"position": g["position"], "count": g["count"],
+             "total_value": round(g["total_value"], 1),
+             "avg_value": round(g["total_value"] / g["count"], 1)}
+            for g in groups.values()]
+    order = {pos: i for i, pos in enumerate(POSITIONS)}
+    rows.sort(key=lambda r: (-r["total_value"], order.get(r["position"], 99)))
+    return rows
+
+
+def positional_balance(roster: list[Player],
+                       roster_slots: dict[str, int] | None = None) -> list[dict]:
+    """Eligible-player count per standard position, flagged thin when it can't
+    cover the league's roster requirement (or, absent one, fewer than two deep)."""
+    slots = roster_slots or {}
+    counts = {pos: 0 for pos in POSITIONS}
+    for p in roster:
+        for pos in p.positions:
+            if pos in counts:
+                counts[pos] += 1
+    out = []
+    for pos in POSITIONS:
+        required = slots.get(pos)
+        need = required if required else 2
+        out.append({"position": pos, "eligible": counts[pos],
+                    "required": required, "thin": counts[pos] < need})
+    return out
+
+
+def team_stat_totals(teams: list[Team], cats: list[str],
+                     games: dict[str, int] | None = None) -> list[dict]:
+    """Per fantasy team: rostered-player count, this-week game count (sum of each
+    player's NBA-team games), and aggregated per-category totals (counting cats
+    sum; percentage cats average). Used by the League tab's team-stats table."""
+    games = games or {}
+    rows = []
+    for t in teams:
+        totals = _team_totals(t, cats)
+        rows.append({"team_key": t.team_key, "name": t.name,
+                     "players": len(t.players),
+                     "games_week": sum(games.get(p.nba_team, 0) for p in t.players),
+                     "stats": totals})
     return rows
 
 

@@ -1,17 +1,22 @@
 from fantasy_gm.analytics import (
+    best_player,
     buy_low_sell_high,
     category_profile,
     points_value_board,
+    position_strengths,
+    positional_balance,
     recommended_pickups,
     streaming_board,
+    team_stat_totals,
 )
 from fantasy_gm.schemas import LeagueSettings, Player, Team
 
 CATS = ["PTS", "AST", "TO"]
 
 
-def _p(pid, **stats):
-    return Player(player_id=pid, name=f"P{pid}", nba_team="LAL", stats=stats)
+def _p(pid, positions=None, **stats):
+    return Player(player_id=pid, name=f"P{pid}", nba_team="LAL",
+                  positions=positions or [], stats=stats)
 
 
 def test_category_profile_you_vs_league_average():
@@ -200,3 +205,48 @@ def test_teams_to_target_skips_teams_without_free_agents():
     day_teams = {"Wed": ["PHX"]}
     out = teams_to_target(roster, free_agents=[], day_teams=day_teams, settings=cat)
     assert out == []
+
+
+# --- Roster analytics (positions / best player / balance / team stats) ---
+
+_CAT = LeagueSettings(league_key="k", format="category", categories=["PTS", "AST"])
+
+
+def test_best_player_picks_top_value():
+    roster = [_p("1", PTS=30, AST=8), _p("2", PTS=10, AST=2)]
+    top = best_player(roster, _CAT)
+    assert top["player_id"] == "1"
+    assert top["value"] == 38
+
+
+def test_position_strengths_credits_each_eligible_position():
+    roster = [_p("1", positions=["PG", "SG"], PTS=20, AST=5),
+              _p("2", positions=["SG"], PTS=10, AST=1)]
+    rows = position_strengths(roster, _CAT)
+    sg = next(r for r in rows if r["position"] == "SG")
+    assert sg["count"] == 2 and sg["total_value"] == 36  # 25 + 11
+    # sorted strongest total first
+    assert rows[0]["total_value"] >= rows[-1]["total_value"]
+
+
+def test_positional_balance_flags_thin_slots():
+    roster = [_p("1", positions=["PG"]), _p("2", positions=["C"]), _p("3", positions=["C"])]
+    bal = {b["position"]: b for b in positional_balance(roster)}
+    assert bal["PG"]["eligible"] == 1 and bal["PG"]["thin"] is True   # <2 deep
+    assert bal["C"]["eligible"] == 2 and bal["C"]["thin"] is False
+    assert bal["SF"]["eligible"] == 0 and bal["SF"]["thin"] is True
+
+
+def test_positional_balance_respects_roster_slots():
+    roster = [_p("1", positions=["C"]), _p("2", positions=["C"]), _p("3", positions=["C"])]
+    bal = {b["position"]: b for b in positional_balance(roster, {"C": 2})}
+    assert bal["C"]["required"] == 2 and bal["C"]["thin"] is False   # 3 >= 2
+
+
+def test_team_stat_totals_aggregates_and_counts_games():
+    teams = [Team(team_key="t1", name="Mine",
+                  players=[_p("1", PTS=20, AST=5), _p("2", PTS=10, AST=3)])]
+    rows = team_stat_totals(teams, ["PTS", "AST"], games={"LAL": 3})
+    assert rows[0]["players"] == 2
+    assert rows[0]["stats"]["PTS"] == 30
+    assert rows[0]["games_week"] == 6      # two LAL players x 3 games

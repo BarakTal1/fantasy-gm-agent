@@ -17,7 +17,13 @@ function RosterCard({ p }: { p: RosterOutlookRow }) {
     <li className="roster-card">
       <PlayerAvatar name={p.name} image_url={p.image_url} />
       <div className="roster-main">
-        <div className="roster-name">{p.name} <em>{p.nba_team} · {p.games} gm</em></div>
+        <div className="roster-name">
+          {p.name}
+          <span className="pos-tags">
+            {p.positions.map((pos) => <span key={pos} className="pos-tag">{pos}</span>)}
+          </span>
+          <em>{p.nba_team} · {p.games} gm</em>
+        </div>
         <div className="roster-proj">{proj}</div>
       </div>
       <span className={`form-tag form-${p.form}`}>{FORM_LABEL[p.form]}</span>
@@ -49,8 +55,56 @@ export function MyTeamView() {
   const you = cats.map((c) => data.category_profile![c].you);
   const league = cats.map((c) => data.category_profile![c].league_avg);
 
+  const best = data.best_player;
+  const strongest = data.position_strengths[0];
+  const valueLabel = data.format === "points" ? "pts" : "cat value";
+
   return (
     <div className="dashboard">
+      <figure className="chart">
+        <figcaption>Team analytics</figcaption>
+        <div className="analytics-grid">
+          {best && (
+            <div className="stat-tile">
+              <span className="stat-tile-label">Best player</span>
+              <div className="stat-tile-main">
+                <PlayerAvatar name={best.name} image_url={best.image_url} size={34} />
+                <div>
+                  <div className="stat-tile-value">{best.name}</div>
+                  <div className="stat-tile-sub">
+                    {best.positions.join("/")} · {best.value} {valueLabel}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {strongest && (
+            <div className="stat-tile">
+              <span className="stat-tile-label">Strongest position</span>
+              <div className="stat-tile-value stat-tile-pos">{strongest.position}</div>
+              <div className="stat-tile-sub">
+                {strongest.count} players · {strongest.avg_value} avg {valueLabel}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="pos-balance">
+          <span className="pos-balance-label">Positional depth</span>
+          <div className="pos-balance-row">
+            {data.positional_balance.map((b) => (
+              <div key={b.position} className={"pos-chip" + (b.thin ? " pos-chip-thin" : "")}>
+                <span className="pos-chip-pos">{b.position}</span>
+                <span className="pos-chip-count">{b.eligible}</span>
+              </div>
+            ))}
+          </div>
+          <p className="chart-hint">
+            Players eligible at each slot (multi-position players count in each).
+            {data.positional_balance.some((b) => b.thin) && " Gold = thin depth."}
+          </p>
+        </div>
+      </figure>
+
       <figure className="chart">
         <figcaption>Your roster — this week</figcaption>
         <ul className="roster-list">

@@ -4,7 +4,10 @@
       "player_id": "1629631",
       "name": "De'Andre Hunter",
       "nba_team": "CLE",
-      "positions": [],
+      "positions": [
+        "SF",
+        "PF"
+      ],
       "stats": {
         "PTS": 17.0,
         "REB": 4.0,
@@ -21,7 +24,9 @@
       "player_id": "1629655",
       "name": "Daniel Gafford",
       "nba_team": "DAL",
-      "positions": [],
+      "positions": [
+        "C"
+      ],
       "stats": {
         "PTS": 12.3,
         "REB": 6.8,
@@ -38,7 +43,10 @@
       "player_id": "1642264",
       "name": "Stephon Castle",
       "nba_team": "SAS",
-      "positions": [],
+      "positions": [
+        "PG",
+        "SG"
+      ],
       "stats": {
         "PTS": 14.7,
         "REB": 3.7,
@@ -55,7 +63,9 @@
       "player_id": "1627736",
       "name": "Malik Beasley",
       "nba_team": "DET",
-      "positions": [],
+      "positions": [
+        "SG"
+      ],
       "stats": {
         "PTS": 16.3,
         "REB": 2.6,
@@ -72,7 +82,10 @@
       "player_id": "1631097",
       "name": "Bennedict Mathurin",
       "nba_team": "IND",
-      "positions": [],
+      "positions": [
+        "SG",
+        "SF"
+      ],
       "stats": {
         "PTS": 16.1,
         "REB": 5.3,
@@ -89,7 +102,10 @@
       "player_id": "1626156",
       "name": "D'Angelo Russell",
       "nba_team": "BKN",
-      "positions": [],
+      "positions": [
+        "PG",
+        "SG"
+      ],
       "stats": {
         "PTS": 12.6,
         "REB": 2.8,
@@ -106,7 +122,9 @@
       "player_id": "203932",
       "name": "Aaron Gordon",
       "nba_team": "DEN",
-      "positions": [],
+      "positions": [
+        "PF"
+      ],
       "stats": {
         "PTS": 14.7,
         "REB": 4.8,
@@ -123,7 +141,10 @@
       "player_id": "1641764",
       "name": "Brandin Podziemski",
       "nba_team": "GSW",
-      "positions": [],
+      "positions": [
+        "PG",
+        "SG"
+      ],
       "stats": {
         "PTS": 11.7,
         "REB": 5.1,
@@ -140,7 +161,9 @@
       "player_id": "203471",
       "name": "Dennis Schr\u00f6der",
       "nba_team": "DET",
-      "positions": [],
+      "positions": [
+        "PG"
+      ],
       "stats": {
         "PTS": 13.1,
         "REB": 2.6,
@@ -157,7 +180,10 @@
       "player_id": "1628978",
       "name": "Donte DiVincenzo",
       "nba_team": "MIN",
-      "positions": [],
+      "positions": [
+        "SG",
+        "SF"
+      ],
       "stats": {
         "PTS": 11.7,
         "REB": 3.7,
@@ -174,7 +200,10 @@
       "player_id": "1630228",
       "name": "Jonathan Kuminga",
       "nba_team": "GSW",
-      "positions": [],
+      "positions": [
+        "SF",
+        "PF"
+      ],
       "stats": {
         "PTS": 15.3,
         "REB": 4.6,
@@ -191,7 +220,10 @@
       "player_id": "201950",
       "name": "Jrue Holiday",
       "nba_team": "BOS",
-      "positions": [],
+      "positions": [
+        "PG",
+        "SG"
+      ],
       "stats": {
         "PTS": 11.1,
         "REB": 4.3,
@@ -208,7 +240,10 @@
       "player_id": "1628398",
       "name": "Kyle Kuzma",
       "nba_team": "MIL",
-      "positions": [],
+      "positions": [
+        "SF",
+        "PF"
+      ],
       "stats": {
         "PTS": 14.8,
         "REB": 5.7,
@@ -225,7 +260,10 @@
       "player_id": "1630245",
       "name": "Ayo Dosunmu",
       "nba_team": "CHI",
-      "positions": [],
+      "positions": [
+        "PG",
+        "SG"
+      ],
       "stats": {
         "PTS": 12.3,
         "REB": 3.5,
@@ -242,7 +280,9 @@
       "player_id": "1641726",
       "name": "Dereck Lively II",
       "nba_team": "DAL",
-      "positions": [],
+      "positions": [
+        "C"
+      ],
       "stats": {
         "PTS": 8.7,
         "REB": 7.5,
@@ -259,7 +299,9 @@
       "player_id": "1630703",
       "name": "Scoot Henderson",
       "nba_team": "POR",
-      "positions": [],
+      "positions": [
+        "PG"
+      ],
       "stats": {
         "PTS": 12.7,
         "REB": 3.0,
@@ -276,7 +318,10 @@
       "player_id": "1630529",
       "name": "Herbert Jones",
       "nba_team": "NOP",
-      "positions": [],
+      "positions": [
+        "SF",
+        "PF"
+      ],
       "stats": {
         "PTS": 10.3,
         "REB": 3.9,
@@ -293,7 +338,10 @@
       "player_id": "1630230",
       "name": "Naji Marshall",
       "nba_team": "DAL",
-      "positions": [],
+      "positions": [
+        "SF",
+        "PF"
+      ],
       "stats": {
         "PTS": 13.2,
         "REB": 4.8,
@@ -310,7 +358,10 @@
       "player_id": "202691",
       "name": "Klay Thompson",
       "nba_team": "DAL",
-      "positions": [],
+      "positions": [
+        "SG",
+        "SF"
+      ],
       "stats": {
         "PTS": 14.0,
         "REB": 3.4,
@@ -327,7 +378,10 @@
       "player_id": "1631095",
       "name": "Jabari Smith Jr.",
       "nba_team": "HOU",
-      "positions": [],
+      "positions": [
+        "PF",
+        "C"
+      ],
       "stats": {
         "PTS": 12.2,
         "REB": 7.0,
@@ -344,7 +398,10 @@
       "player_id": "1627747",
       "name": "Caris LeVert",
       "nba_team": "ATL",
-      "positions": [],
+      "positions": [
+        "PG",
+        "SG"
+      ],
       "stats": {
         "PTS": 12.1,
         "REB": 3.2,
@@ -361,7 +418,9 @@
       "player_id": "1629060",
       "name": "Rui Hachimura",
       "nba_team": "LAL",
-      "positions": [],
+      "positions": [
+        "PF"
+      ],
       "stats": {
         "PTS": 13.1,
         "REB": 5.0,
@@ -378,7 +437,10 @@
       "player_id": "1641709",
       "name": "Ausar Thompson",
       "nba_team": "DET",
-      "positions": [],
+      "positions": [
+        "SF",
+        "PF"
+      ],
       "stats": {
         "PTS": 10.1,
         "REB": 5.1,
@@ -395,7 +457,9 @@
       "player_id": "1631110",
       "name": "Jeremy Sochan",
       "nba_team": "SAS",
-      "positions": [],
+      "positions": [
+        "PF"
+      ],
       "stats": {
         "PTS": 11.4,
         "REB": 6.5,
@@ -412,7 +476,10 @@
       "player_id": "203114",
       "name": "Khris Middleton",
       "nba_team": "WAS",
-      "positions": [],
+      "positions": [
+        "SF",
+        "PF"
+      ],
       "stats": {
         "PTS": 11.9,
         "REB": 3.7,
@@ -429,7 +496,9 @@
       "player_id": "1628415",
       "name": "Dillon Brooks",
       "nba_team": "HOU",
-      "positions": [],
+      "positions": [
+        "SF"
+      ],
       "stats": {
         "PTS": 14.0,
         "REB": 3.7,
@@ -446,7 +515,9 @@
       "player_id": "1630631",
       "name": "Jose Alvarado",
       "nba_team": "NOP",
-      "positions": [],
+      "positions": [
+        "PG"
+      ],
       "stats": {
         "PTS": 10.3,
         "REB": 2.4,
@@ -463,7 +534,9 @@
       "player_id": "1642274",
       "name": "Yves Missi",
       "nba_team": "NOP",
-      "positions": [],
+      "positions": [
+        "C"
+      ],
       "stats": {
         "PTS": 9.1,
         "REB": 8.2,
@@ -480,7 +553,10 @@
       "player_id": "1641711",
       "name": "Gradey Dick",
       "nba_team": "TOR",
-      "positions": [],
+      "positions": [
+        "SG",
+        "SF"
+      ],
       "stats": {
         "PTS": 14.4,
         "REB": 3.6,
@@ -497,7 +573,10 @@
       "player_id": "201143",
       "name": "Al Horford",
       "nba_team": "BOS",
-      "positions": [],
+      "positions": [
+        "PF",
+        "C"
+      ],
       "stats": {
         "PTS": 9.0,
         "REB": 6.2,
@@ -514,7 +593,9 @@
       "player_id": "1641744",
       "name": "Zach Edey",
       "nba_team": "MEM",
-      "positions": [],
+      "positions": [
+        "C"
+      ],
       "stats": {
         "PTS": 9.2,
         "REB": 8.3,
@@ -531,7 +612,9 @@
       "player_id": "1630590",
       "name": "Scotty Pippen Jr.",
       "nba_team": "MEM",
-      "positions": [],
+      "positions": [
+        "PG"
+      ],
       "stats": {
         "PTS": 9.9,
         "REB": 3.3,
@@ -548,7 +631,9 @@
       "player_id": "1626145",
       "name": "Tyus Jones",
       "nba_team": "PHX",
-      "positions": [],
+      "positions": [
+        "PG"
+      ],
       "stats": {
         "PTS": 10.2,
         "REB": 2.4,
@@ -565,7 +650,9 @@
       "player_id": "203994",
       "name": "Jusuf Nurki\u0107",
       "nba_team": "CHA",
-      "positions": [],
+      "positions": [
+        "C"
+      ],
       "stats": {
         "PTS": 8.9,
         "REB": 7.8,
@@ -582,7 +669,10 @@
       "player_id": "1642272",
       "name": "Jared McCain",
       "nba_team": "PHI",
-      "positions": [],
+      "positions": [
+        "PG",
+        "SG"
+      ],
       "stats": {
         "PTS": 15.3,
         "REB": 2.4,
@@ -599,7 +689,10 @@
       "player_id": "1629614",
       "name": "Andrew Nembhard",
       "nba_team": "IND",
-      "positions": [],
+      "positions": [
+        "PG",
+        "SG"
+      ],
       "stats": {
         "PTS": 10.0,
         "REB": 3.3,
@@ -616,7 +709,9 @@
       "player_id": "203991",
       "name": "Clint Capela",
       "nba_team": "ATL",
-      "positions": [],
+      "positions": [
+        "C"
+      ],
       "stats": {
         "PTS": 8.9,
         "REB": 8.5,
@@ -633,7 +728,10 @@
       "player_id": "1627763",
       "name": "Malcolm Brogdon",
       "nba_team": "WAS",
-      "positions": [],
+      "positions": [
+        "PG",
+        "SG"
+      ],
       "stats": {
         "PTS": 12.7,
         "REB": 3.8,
@@ -650,7 +748,9 @@
       "player_id": "202685",
       "name": "Jonas Valan\u010di\u016bnas",
       "nba_team": "SAC",
-      "positions": [],
+      "positions": [
+        "C"
+      ],
       "stats": {
         "PTS": 10.4,
         "REB": 7.7,
@@ -667,7 +767,10 @@
       "player_id": "1627824",
       "name": "Guerschon Yabusele",
       "nba_team": "PHI",
-      "positions": [],
+      "positions": [
+        "PF",
+        "C"
+      ],
       "stats": {
         "PTS": 11.0,
         "REB": 5.6,

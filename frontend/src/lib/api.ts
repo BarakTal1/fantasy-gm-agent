@@ -103,6 +103,50 @@ export async function updateSettings(league_format: string) {
   return r.json() as Promise<{ league_format: string }>;
 }
 
+// --- Full league-settings editor ---
+export interface LeagueConfig {
+  name: string;
+  format: "category" | "points";
+  categories: string[];
+  point_weights: Record<string, number>;
+  roster_slots: Record<string, number>;
+  source: "manual" | "demo";
+  yahoo_connected: boolean;
+  options: { categories: string[]; point_stats: string[]; positions: string[] };
+}
+export interface LeagueConfigInput {
+  name: string;
+  format: "category" | "points";
+  categories: string[];
+  point_weights: Record<string, number>;
+  roster_slots: Record<string, number>;
+}
+
+async function jsend(path: string, method: string, body: object) {
+  const r = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    ...CREDS,
+  });
+  if (!r.ok) {
+    let detail = `HTTP ${r.status}`;
+    try { detail = (await r.json()).detail ?? detail; } catch { /* ignore */ }
+    throw new Error(detail);
+  }
+  return r.json();
+}
+
+export async function getLeagueConfig() {
+  return jget("/settings/league") as Promise<LeagueConfig>;
+}
+export async function saveLeagueConfig(cfg: LeagueConfigInput) {
+  return jsend("/settings/league", "PUT", cfg) as Promise<LeagueConfig>;
+}
+export async function syncLeagueFromYahoo() {
+  return jsend("/settings/league/sync-yahoo", "POST", {}) as Promise<LeagueConfig>;
+}
+
 // --- Analytics (subject-scoped) ---
 export interface CategoryProfile { [cat: string]: { you: number; league_avg: number } }
 export interface BuySellRow {
@@ -118,13 +162,27 @@ export interface RecommendedPickup {
 
 export interface RosterOutlookRow {
   player_id: string; name: string; nba_team: string; image_url?: string | null;
+  positions: string[];
   games: number; form: "buy_low" | "sell_high" | "neutral";
   projected?: Record<string, number>; projected_points?: number;
+}
+export interface BestPlayer {
+  player_id: string; name: string; nba_team: string; positions: string[];
+  image_url?: string | null; value: number;
+}
+export interface PositionStrength {
+  position: string; count: number; total_value: number; avg_value: number;
+}
+export interface PositionBalance {
+  position: string; eligible: number; required: number | null; thin: boolean;
 }
 export async function getMyTeamAnalytics() {
   return jget("/analytics/my-team") as Promise<{
     format: "category" | "points";
     roster: RosterOutlookRow[];
+    best_player: BestPlayer | null;
+    position_strengths: PositionStrength[];
+    positional_balance: PositionBalance[];
     category_profile?: CategoryProfile;
   }>;
 }
@@ -145,10 +203,15 @@ export async function getWaiversAnalytics() {
     teams_to_target: TeamTarget[];
   }>;
 }
+export interface TeamStatRow {
+  team_key: string; name: string; players: number; games_week: number;
+  stats: Record<string, number>;
+}
 export async function getLeagueAnalytics() {
   return jget("/analytics/league") as Promise<{
     format: "category" | "points";
     teams: Team[]; my_team_key: string;
+    team_stats: TeamStatRow[];
     category_profile?: CategoryProfile;
     buy_low_sell_high: BuySellRow[];
   }>;

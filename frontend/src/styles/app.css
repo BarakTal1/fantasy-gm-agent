@@ -364,6 +364,40 @@
 .soon-tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
   color: var(--primary); background: var(--glow); padding: 4px 10px; border-radius: var(--radius-pill); }
 
+/* League settings editor */
+.cfg-sync-row { align-items: flex-start; }
+.cfg-sync-label { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; flex-wrap: wrap; }
+.cfg-sync-btn { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); }
+.cfg-sync-btn:disabled { opacity: .6; cursor: default; }
+.cfg-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.cfg-field { display: block; margin-top: 14px; }
+.cfg-field-label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.cfg-input { width: 100%; font: inherit; font-size: 15px; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--text); }
+.cfg-input:focus { outline: 2px solid var(--ring); outline-offset: 1px; border-color: transparent; }
+.cfg-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.cfg-chip { font-family: var(--display); font-weight: 700; font-size: 13px; cursor: pointer;
+  padding: 6px 14px; border-radius: var(--radius-pill); color: var(--muted);
+  background: var(--surface-2); border: 1px solid var(--border);
+  transition: background .18s var(--ease-out), color .18s var(--ease-out), transform .06s var(--ease-out); }
+.cfg-chip:active { transform: scale(0.96); }
+.cfg-chip-active { background: var(--grad); color: var(--on-primary); border-color: transparent;
+  box-shadow: 0 0 12px 0 var(--glow); }
+.cfg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
+.cfg-num { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.cfg-num input { font: inherit; font-size: 15px; padding: 8px 10px; text-align: center;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--text); }
+.cfg-num input:focus { outline: 2px solid var(--ring); outline-offset: 1px; border-color: transparent; }
+.cfg-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.cfg-notice { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: var(--accent); }
+.cfg-src-tag { font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: 3px 9px;
+  border-radius: var(--radius-pill); color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 14%, transparent); }
+.cfg-src-live { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
+
 /* Weekday bars */
 .weekbars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end;
   height: 140px; padding: 6px 2px 0; }
@@ -434,6 +468,39 @@
 .form-buy_low { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
 .form-sell_high { color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); }
 .form-neutral { color: var(--muted); background: color-mix(in srgb, var(--muted) 14%, transparent); }
+
+/* Position tags on roster cards */
+.pos-tags { display: inline-flex; gap: 4px; margin: 0 2px 0 8px; vertical-align: middle; }
+.pos-tag { font-size: 10px; font-weight: 700; letter-spacing: .03em; padding: 1px 6px;
+  border-radius: var(--radius-pill); color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent); }
+
+/* My Team — analytics tiles */
+.analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat-tile { border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface-2); padding: 12px 14px; }
+.stat-tile-label { font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--muted); }
+.stat-tile-main { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.stat-tile-value { font-family: var(--display); font-weight: 700; font-size: 16px;
+  margin-top: 6px; }
+.stat-tile-pos { font-size: 28px; color: var(--primary); }
+.stat-tile-sub { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* My Team — positional depth chips */
+.pos-balance { margin-top: 16px; }
+.pos-balance-label { font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--muted); }
+.pos-balance-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.pos-chip { display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 52px; padding: 8px 0; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--surface-2); }
+.pos-chip-pos { font-size: 11px; font-weight: 700; color: var(--muted); }
+.pos-chip-count { font-family: var(--display); font-weight: 700; font-size: 18px; }
+.pos-chip-thin { border-color: var(--gold); }
+.pos-chip-thin .pos-chip-count { color: var(--gold); }
+
+@media (max-width: 480px) { .analytics-grid { grid-template-columns: 1fr; } }
 
 @media (max-width: 560px) {
   .trade-sides { grid-template-columns: 1fr; }

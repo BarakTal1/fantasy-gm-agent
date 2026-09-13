@@ -45,4 +45,14 @@ describe("auth", () => {
     renderWith(<Header theme="light" onToggle={() => {}} />);
     expect(await screen.findByText("you@x.com")).toBeInTheDocument();
   });
+
+  it("signs out from the account menu", async () => {
+    vi.spyOn(api, "getMe").mockResolvedValue({ email: "you@x.com", league_format: "points" });
+    const out = vi.spyOn(api, "logout").mockResolvedValue({ ok: true } as never);
+    renderWith(<Header theme="light" onToggle={() => {}} />);
+
+    await userEvent.click(await screen.findByRole("button", { name: /you@x.com/i }));
+    await userEvent.click(await screen.findByRole("menuitem", { name: /sign out/i }));
+    expect(out).toHaveBeenCalled();
+  });
 });

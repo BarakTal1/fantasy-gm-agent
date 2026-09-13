@@ -98,19 +98,44 @@ class SettingsPatch(BaseModel):
     league_format: str
 
 
+class LeagueConfigPatch(BaseModel):
+    name: str = ""
+    format: str
+    categories: list[str] = []
+    point_weights: dict[str, float] = {}
+    roster_slots: dict[str, int] = {}
+
+
+# Editable option lists surfaced to the Settings editor. Categories/points stats
+# are constrained to the stat keys the demo data actually carries, so a manual
+# league still computes real analytics; positions match the standard NBA slots.
+_CATEGORY_OPTIONS = ["FG%", "FT%", "3PTM", "PTS", "REB", "AST", "ST", "BLK", "TO"]
+_POINT_STAT_OPTIONS = ["PTS", "REB", "AST", "3PTM", "ST", "BLK", "TO"]
+_POSITION_OPTIONS = ["PG", "SG", "SF", "PF", "C", "G", "F", "UTIL"]
+
+
 _COOKIE = "session"
 
 
 _LOCAL_HOSTS = {"testserver", "localhost", "127.0.0.1"}
 
 
+def _cookie_policy(request: Request) -> tuple[bool, str]:
+    """(secure, samesite) for the session cookie, scoped to the host.
+
+    Real hosts (Vercel↔Railway) are cross-site, so the cookie must be
+    SameSite=None + Secure. On local hosts the frontend and API are same-site
+    (both `localhost`) served over plain http, where a Secure cookie is dropped
+    AND SameSite=None-without-Secure is rejected by browsers — so use Lax, which
+    is valid without Secure and still sent on same-site requests."""
+    local = (request.url.hostname or "") in _LOCAL_HOSTS
+    return (False, "lax") if local else (True, "none")
+
+
 def _set_session(response: Response, request: Request, user_id: int) -> None:
-    # SameSite=None needs Secure on real cross-site hosts (Vercel↔Railway). Over
-    # plain http (TestClient's "testserver", local dev) a Secure cookie would be
-    # dropped, so scope Secure to real hostnames.
-    secure = (request.url.hostname or "") not in _LOCAL_HOSTS
+    secure, samesite = _cookie_policy(request)
     response.set_cookie(_COOKIE, users.make_token(user_id), httponly=True,
-                        secure=secure, samesite="none",
+                        secure=secure, samesite=samesite,
                         max_age=30 * 24 * 3600, path="/")
 
 
@@ -124,15 +149,29 @@ def _load_league() -> LeagueSettings:
     return get_league_settings(LEAGUE_KEY)
 
 
-def _league_for(request: Request) -> LeagueSettings:
-    """League settings for this request. A signed-in user in demo mode gets their
-    saved format's fixture (the single-league Postgres cache can't hold two formats
-    at once); otherwise fall back to the shared league (patchable in tests / real
-    Yahoo league live)."""
-    u = _current_user(request)
-    if u and get_settings().demo_mode:
+def _user_league(u: dict) -> LeagueSettings:
+    """A signed-in user's league settings: their saved manual config if they have
+    one, else the demo fixture for their chosen format (single-league Postgres
+    cache can't hold two formats at once), else the shared live/DB league."""
+    cfg = u.get("league_config") or {}
+    if cfg.get("format"):
+        return LeagueSettings(
+            league_key=LEAGUE_KEY, format=cfg["format"], name=cfg.get("name", ""),
+            categories=cfg.get("categories", []),
+            point_weights=cfg.get("point_weights", {}),
+            roster_slots=cfg.get("roster_slots", {}))
+    if get_settings().demo_mode:
         from fantasy_gm import demo
         return demo.demo_league_settings(u["league_format"])
+    return _load_league()
+
+
+def _league_for(request: Request) -> LeagueSettings:
+    """League settings for this request — a signed-in user's config, or the shared
+    league (patchable in tests / real Yahoo league live) when anonymous."""
+    u = _current_user(request)
+    if u:
+        return _user_league(u)
     return _load_league()
 
 
@@ -157,8 +196,13 @@ def login(creds: Credentials, request: Request, response: Response) -> dict:
 
 
 @app.post("/auth/logout")
-def logout(response: Response) -> dict:
-    response.delete_cookie(_COOKIE, path="/")
+def logout(request: Request, response: Response) -> dict:
+    # The browser only clears a cookie when the deletion Set-Cookie carries the
+    # SAME attributes it was set with. So mirror _set_session's policy exactly,
+    # otherwise a cross-site delete is ignored and the user stays logged in.
+    secure, samesite = _cookie_policy(request)
+    response.delete_cookie(_COOKIE, path="/", samesite=samesite, secure=secure,
+                           httponly=True)
     return {"ok": True}
 
 
@@ -180,6 +224,86 @@ def update_settings(patch: SettingsPatch, request: Request) -> dict:
     execute("UPDATE users SET league_format=%s WHERE id=%s",
             (patch.league_format, u["id"]))
     return {"league_format": patch.league_format}
+
+
+def _yahoo_connected() -> bool:
+    """True when a Yahoo OAuth token is stored (Fantasy API access granted)."""
+    from fantasy_gm.db import fetch_one
+    try:
+        return fetch_one("SELECT 1 FROM oauth_tokens WHERE id=1") is not None
+    except Exception:
+        return False
+
+
+def _league_config_response(u: dict) -> dict:
+    s = _user_league(u)
+    cfg = u.get("league_config") or {}
+    return {
+        "name": s.name,
+        "format": s.format,
+        "categories": s.categories,
+        "point_weights": s.point_weights,
+        "roster_slots": s.roster_slots,
+        "source": "manual" if cfg.get("format") else "demo",
+        "yahoo_connected": _yahoo_connected(),
+        "options": {"categories": _CATEGORY_OPTIONS,
+                    "point_stats": _POINT_STAT_OPTIONS,
+                    "positions": _POSITION_OPTIONS},
+    }
+
+
+@app.get("/settings/league")
+def get_league_config(request: Request) -> dict:
+    u = _current_user(request)
+    if not u:
+        raise HTTPException(status_code=401, detail="Not signed in.")
+    return _league_config_response(u)
+
+
+@app.put("/settings/league")
+def put_league_config(patch: LeagueConfigPatch, request: Request) -> dict:
+    u = _current_user(request)
+    if not u:
+        raise HTTPException(status_code=401, detail="Not signed in.")
+    if patch.format not in {"category", "points"}:
+        raise HTTPException(status_code=400, detail="Invalid league format.")
+    if patch.format == "category" and not patch.categories:
+        raise HTTPException(status_code=400,
+                            detail="Pick at least one scoring category.")
+    if patch.format == "points" and not patch.point_weights:
+        raise HTTPException(status_code=400,
+                            detail="Set at least one point weight.")
+    config = {"name": patch.name.strip(), "format": patch.format,
+              "categories": patch.categories, "point_weights": patch.point_weights,
+              "roster_slots": patch.roster_slots}
+    users.set_league_config(u["id"], config, patch.format)
+    return _league_config_response(users.get_user_by_id(u["id"]))
+
+
+@app.post("/settings/league/sync-yahoo")
+def sync_league_from_yahoo(request: Request) -> dict:
+    """Pull league settings from the connected Yahoo account. Graceful fallback:
+    while Fantasy API access is still pending (no stored OAuth token), this returns
+    409 so the UI can show a clear 'not connected yet' state instead of failing."""
+    u = _current_user(request)
+    if not u:
+        raise HTTPException(status_code=401, detail="Not signed in.")
+    if not _yahoo_connected():
+        raise HTTPException(
+            status_code=409,
+            detail="Yahoo isn't connected yet — Fantasy API access is pending "
+                   "approval. Set your league up manually for now.")
+    from fantasy_gm.yahoo_client import client as yahoo_client
+    try:
+        s = yahoo_client.parse_league_settings(
+            yahoo_client._get(f"league/{LEAGUE_KEY}/settings"))
+    except Exception as e:                      # network / parse / auth failure
+        raise HTTPException(status_code=502,
+                            detail=f"Couldn't reach Yahoo: {e}") from e
+    config = {"name": s.name, "format": s.format, "categories": s.categories,
+              "point_weights": s.point_weights, "roster_slots": s.roster_slots}
+    users.set_league_config(u["id"], config, s.format)
+    return _league_config_response(users.get_user_by_id(u["id"]))
 
 
 MY_WEEK = 15  # demo week
@@ -278,9 +402,12 @@ def league_info(request: Request) -> dict:
     # A signed-in user in demo mode sees their chosen format; otherwise fetch fresh
     # from Yahoo (live) / the fixture (demo) so the league display name is present.
     u = _current_user(request)
-    if u and get_settings().demo_mode:
-        from fantasy_gm import demo
-        s = demo.demo_league_settings(u["league_format"])
+    if u:
+        s = _user_league(u)
+        # Fall back to the fixture name when a manual config left the name blank.
+        if not s.name and get_settings().demo_mode:
+            from fantasy_gm import demo
+            s.name = demo.demo_league_settings(u["league_format"]).name
     else:
         s = _league_info()
     return {"name": s.name, "format": s.format, "format_label": s.format_label}
@@ -301,7 +428,11 @@ def analytics_my_team(request: Request) -> dict:
     roster_trends = _trends_for([p.player_id for p in mine.players])
     out = {"format": league.format,
            "roster": analytics.roster_week_outlook(
-               mine.players, roster_trends, games, league)}
+               mine.players, roster_trends, games, league),
+           "best_player": analytics.best_player(mine.players, league),
+           "position_strengths": analytics.position_strengths(mine.players, league),
+           "positional_balance": analytics.positional_balance(
+               mine.players, league.roster_slots)}
     if league.is_category:
         out["category_profile"] = analytics.category_profile(
             mine, teams, league.categories)
@@ -337,11 +468,16 @@ def analytics_league(request: Request) -> dict:
     teams = _all_teams()
     mine = next((t for t in teams if t.team_key == MY_TEAM_KEY), teams[0])
     fas = _free_agents()
+    games = _week_games()
     roster_trends = _trends_for([p.player_id for p in mine.players])
     fa_trends = _trends_for([p.player_id for p in fas])
+    # Categories drive which stat columns the League table shows. For a points
+    # league there are no `categories`, so fall back to the core box-score line.
+    stat_cats = league.categories or ["PTS", "REB", "AST", "ST", "BLK", "3PTM", "TO"]
     out = {"format": league.format,
            "teams": [t.model_dump() for t in teams],
            "my_team_key": MY_TEAM_KEY,
+           "team_stats": analytics.team_stat_totals(teams, stat_cats, games),
            "buy_low_sell_high": analytics.buy_low_sell_high(
                mine.players + fas, {**roster_trends, **fa_trends},
                league.categories)[:12] if league.is_category else []}

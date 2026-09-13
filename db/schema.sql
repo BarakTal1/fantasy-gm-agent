@@ -37,3 +37,8 @@ CREATE TABLE IF NOT EXISTS users (
     league_format TEXT NOT NULL DEFAULT 'category',
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Per-user manual league settings (name / format / categories / point weights /
+-- roster slots). Empty '{}' means "use the demo fixture for league_format".
+-- Added via ALTER so existing databases pick it up on the next migration run.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS league_config JSONB NOT NULL DEFAULT '{}'::jsonb;
