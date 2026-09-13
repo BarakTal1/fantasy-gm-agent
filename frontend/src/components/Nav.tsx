@@ -1,11 +1,11 @@
 import { NavLink } from "react-router-dom";
 
 const TABS = [
-  { to: "/", label: "Chat" },
-  { to: "/my-team", label: "My Team" },
-  { to: "/waivers", label: "Waivers" },
-  { to: "/trade", label: "Trade" },
-  { to: "/league", label: "League" },
+  { to: "/app", label: "Chat", end: true },
+  { to: "/app/my-team", label: "My Team", end: false },
+  { to: "/app/waivers", label: "Waivers", end: false },
+  { to: "/app/trade", label: "Trade", end: false },
+  { to: "/app/league", label: "League", end: false },
 ];
 
 export function Nav() {
@@ -15,7 +15,7 @@ export function Nav() {
         <NavLink
           key={t.to}
           to={t.to}
-          end
+          end={t.end}
           className={({ isActive }) => "tab" + (isActive ? " active" : "")}
         >
           {t.label}

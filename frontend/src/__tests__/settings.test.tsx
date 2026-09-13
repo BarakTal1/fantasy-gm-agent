@@ -1,13 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import * as api from "../lib/api";
 import { AuthProvider } from "../state/auth";
 import { SettingsView } from "../views/SettingsView";
 
 function renderSettings() {
   return render(
-    <AuthProvider><SettingsView theme="light" onToggle={() => {}} /></AuthProvider>,
+    <AuthProvider>
+      <MemoryRouter><SettingsView theme="light" onToggle={() => {}} /></MemoryRouter>
+    </AuthProvider>,
   );
 }
 

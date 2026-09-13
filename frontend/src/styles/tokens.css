@@ -19,6 +19,11 @@
   --radius: 16px; --radius-sm: 12px; --radius-pill: 999px;
   --shadow: 0 1px 2px rgba(13,100,90,.06), 0 6px 20px -4px rgba(13,100,90,.10);
   --shadow-halo: 0 8px 24px -6px rgba(13,100,90,.14), 0 0 16px 0 var(--glow);
+
+  /* Motion — stronger-than-default curves (the built-in CSS easings lack punch) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);       /* entrances, responsive UI */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);   /* on-screen movement */
+  --glow-strong: rgba(20, 184, 166, 0.45);
 }
 
 /* Warm dark mode (deep arena soot) */
@@ -47,5 +52,17 @@
 body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text);
   font-feature-settings: "tnum" 1, "lnum" 1; }
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Keep loading legible: swap movement for a gentle opacity pulse. */
+  .spin,
+  .typing span,
+  .skeleton {
+    animation: rm-pulse 1.2s ease-in-out infinite !important;
+  }
 }
+@keyframes rm-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }

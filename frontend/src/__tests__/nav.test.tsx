@@ -5,10 +5,12 @@ import { Nav } from "../components/Nav";
 
 describe("Nav", () => {
   it("renders the five tabs with the active one marked", () => {
-    render(<MemoryRouter initialEntries={["/my-team"]}><Nav /></MemoryRouter>);
+    render(<MemoryRouter initialEntries={["/app/my-team"]}><Nav /></MemoryRouter>);
     for (const label of [/chat/i, /my team/i, /waivers/i, /trade/i, /league/i]) {
       expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
     }
     expect(screen.getByRole("link", { name: /my team/i })).toHaveAttribute("aria-current", "page");
+    // The Chat tab uses `end`, so it is not active on a nested route.
+    expect(screen.getByRole("link", { name: /chat/i })).not.toHaveAttribute("aria-current");
   });
 });

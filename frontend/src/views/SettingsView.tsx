@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Moon, Sun, Link2 } from "lucide-react";
 import { useAuth } from "../state/auth";
 import { updateSettings } from "../lib/api";
@@ -34,7 +35,9 @@ export function SettingsView({ theme, onToggle }: { theme: string; onToggle: () 
             <button className="signin-btn" onClick={logout}>Sign out</button>
           </div>
         ) : (
-          <p className="settings-hint">Sign in from the top-right to save your settings.</p>
+          <p className="settings-hint">
+            <Link to="/login" className="settings-signin-link">Sign in</Link> to save your settings.
+          </p>
         )}
       </section>
 

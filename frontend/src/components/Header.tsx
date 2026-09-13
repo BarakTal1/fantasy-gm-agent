@@ -3,12 +3,10 @@ import { Link } from "react-router-dom";
 import { Zap, Settings, LogOut, User } from "lucide-react";
 import { getLeagueInfo } from "../lib/api";
 import { useAuth } from "../state/auth";
-import { AuthModal } from "./AuthModal";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function Header({ theme, onToggle }: { theme: string; onToggle: () => void }) {
   const [league, setLeague] = useState("");
-  const [showAuth, setShowAuth] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, ready, logout } = useAuth();
 
@@ -20,12 +18,14 @@ export function Header({ theme, onToggle }: { theme: string; onToggle: () => voi
 
   return (
     <header className="header">
-      <div className="brand"><span className="mark"><Zap fill="currentColor" /></span>Lightning</div>
+      <Link to="/app" className="brand">
+        <span className="mark"><Zap fill="currentColor" /></span>Lightning
+      </Link>
       {league && <span className="league">{league}</span>}
       <div className="header-right">
         <ThemeToggle theme={theme} onToggle={onToggle} />
         {ready && !user && (
-          <button className="signin-btn" onClick={() => setShowAuth(true)}>Sign in</button>
+          <Link className="signin-btn" to="/login">Sign in</Link>
         )}
         {ready && user && (
           <div className="account" onBlur={() => setMenuOpen(false)} tabIndex={-1}>
@@ -35,7 +35,7 @@ export function Header({ theme, onToggle }: { theme: string; onToggle: () => voi
             </button>
             {menuOpen && (
               <div className="account-menu" role="menu">
-                <Link to="/settings" role="menuitem" className="account-item"
+                <Link to="/app/settings" role="menuitem" className="account-item"
                       onClick={() => setMenuOpen(false)}>
                   <Settings size={15} /> Settings
                 </Link>
@@ -48,7 +48,6 @@ export function Header({ theme, onToggle }: { theme: string; onToggle: () => voi
           </div>
         )}
       </div>
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
     </header>
   );
 }
