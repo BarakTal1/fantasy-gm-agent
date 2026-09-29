@@ -214,6 +214,16 @@ def me(request: Request) -> dict:
     return {"email": u["email"], "league_format": u["league_format"]}
 
 
+@app.get("/auth/yahoo/callback")
+def yahoo_oauth_callback(code: str, state: str = None) -> dict:
+    """Yahoo OAuth callback endpoint — for production OAuth flow support.
+
+    Currently the app uses oob (out-of-band) flow for personal single-league development.
+    This endpoint is configured for Yahoo approval and future multi-user support.
+    """
+    return {"message": "OAuth callback received", "code": code}
+
+
 @app.patch("/settings")
 def update_settings(patch: SettingsPatch, request: Request) -> dict:
     u = _current_user(request)
