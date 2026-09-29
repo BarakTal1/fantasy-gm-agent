@@ -215,13 +215,17 @@ def me(request: Request) -> dict:
 
 
 @app.get("/auth/yahoo/callback")
-def yahoo_oauth_callback(code: str, state: str = None) -> dict:
+def yahoo_oauth_callback(code: str = None, state: str = None, error: str = None) -> dict:
     """Yahoo OAuth callback endpoint — for production OAuth flow support.
 
     Currently the app uses oob (out-of-band) flow for personal single-league development.
     This endpoint is configured for Yahoo approval and future multi-user support.
     """
-    return {"message": "OAuth callback received", "code": code}
+    if error:
+        raise HTTPException(status_code=400, detail=f"OAuth error: {error}")
+    if not code:
+        raise HTTPException(status_code=400, detail="Missing authorization code")
+    return {"status": "authorized", "message": "Authorization received"}
 
 
 @app.patch("/settings")

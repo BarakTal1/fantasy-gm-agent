@@ -1,0 +1,27 @@
+{
+  "fantasy_content": {
+    "league": [
+      {"league_key": "428.l.123456"},
+      {"transactions": {
+        "0": {"transaction": [
+          {"type": "pending_trade", "trader_team_key": "428.l.123456.t.2",
+           "tradee_team_key": "428.l.123456.t.1"},
+          {"players": {
+            "0": {"player": [[{"player_key": "428.p.202681"}, {"player_id": "202681"},
+                   {"name": {"full": "Kyrie Irving"}}],
+                  {"transaction_data": [{"type": "pending_trade",
+                     "source_team_key": "428.l.123456.t.2",
+                     "destination_team_key": "428.l.123456.t.1"}]}]},
+            "1": {"player": [[{"player_key": "428.p.1626164"}, {"player_id": "1626164"},
+                   {"name": {"full": "Devin Booker"}}],
+                  {"transaction_data": [{"type": "pending_trade",
+                     "source_team_key": "428.l.123456.t.1",
+                     "destination_team_key": "428.l.123456.t.2"}]}]},
+            "count": 2
+          }}
+        ]},
+        "count": 1
+      }}
+    ]
+  }
+}
