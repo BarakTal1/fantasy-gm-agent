@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { Nav } from "./Nav";
+import { YahooAttribution } from "./YahooAttribution";
 
 export function AppShell({ theme, onToggle }: { theme: string; onToggle: () => void }) {
   return (
@@ -8,6 +9,7 @@ export function AppShell({ theme, onToggle }: { theme: string; onToggle: () => v
       <Header theme={theme} onToggle={onToggle} />
       <Nav />
       <Outlet />
+      <YahooAttribution />
     </div>
   );
 }

@@ -54,7 +54,7 @@ export function LoginView({ theme, onToggle }: { theme: string; onToggle: () => 
             ))}
           </ul>
         </div>
-        <p className="auth-aside-foot">Runs on a real-NBA demo league — Yahoo sync coming soon.</p>
+        <p className="auth-aside-foot">Runs on a real-NBA demo league. Read-only: it never changes your Yahoo roster.</p>
       </aside>
 
       <main className="auth-main">
@@ -68,7 +68,7 @@ export function LoginView({ theme, onToggle }: { theme: string; onToggle: () => 
           <p className="modal-sub">
             {mode === "login"
               ? "Sign in to save your league format and settings."
-              : "Sign up to save settings and, soon, connect your Yahoo league."}
+              : "Sign up to save your league format and settings."}
           </p>
           <form onSubmit={submit} className="auth-form">
             <label>

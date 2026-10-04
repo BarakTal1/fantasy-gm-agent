@@ -145,7 +145,11 @@ export function LandingView({ theme, onToggle }: { theme: string; onToggle: () =
         <div className="brand lp-logo">
           <span className="mark"><Zap fill="currentColor" /></span>Lightning
         </div>
-        <span className="lp-footer-note">Your fantasy GM, electrified.</span>
+        <span className="lp-footer-note">
+          Fantasy data provided by{" "}
+          <a href="https://sports.yahoo.com/fantasy/" target="_blank" rel="noopener noreferrer">Yahoo Fantasy</a>
+          {" "}· Your fantasy GM, electrified.
+        </span>
       </footer>
     </div>
   );

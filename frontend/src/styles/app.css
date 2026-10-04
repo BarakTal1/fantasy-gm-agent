@@ -553,3 +553,6 @@ a.brand:active { transform: scale(0.98); }
   .empty .example:nth-child(3) { animation-delay: .24s; }
   .empty .example:nth-child(4) { animation-delay: .30s; }
 }
+
+.yahoo-attribution { margin: 24px 0 16px; text-align: center; font-size: 12px; color: var(--muted); }
+.yahoo-attribution a { color: inherit; text-decoration: underline; }

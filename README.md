@@ -6,7 +6,7 @@ Built as a portfolio project demonstrating the full Forward Deployed Engineer li
 
 **🔗 Live demo: https://fantasy-gm-agent.vercel.app** — a three-tab app (Chat · Dashboard · Trade Analyzer) running on real 2024‑25 NBA player data in a demo league (Vercel frontend + Railway backend/Postgres). Ask the chat for waiver pickups, scan the dashboard, or analyze a trade.
 
-> **Status:** Phases 1–6 built; **deployed and live**. Data layer, LangGraph/Claude agent, streaming FastAPI API, guardrails + evals, a polished React UI (Chat + Dashboard + Trade Analyzer, category **and** points leagues), and real-NBA demo data — deployed to a public URL (Sonnet 5 + per-IP rate limiting on the public endpoints). The one remaining external gate is **real Yahoo league data** (awaiting Yahoo's manual API approval; the integration is built + tested against spec-accurate fixtures and flips on with one env change). See [docs/design.md](docs/design.md) and [docs/plans/](docs/plans/).
+> **Status:** Phases 1–6 built; **deployed and live**. Data layer, LangGraph/Claude agent, streaming FastAPI API, guardrails + evals, a polished React UI (Chat + Dashboard + Trade Analyzer, category **and** points leagues), and real-NBA demo data — deployed to a public URL (Sonnet 5 + per-IP rate limiting on the public endpoints). The one remaining external gate is **real Yahoo league data** (awaiting Yahoo's manual API approval — see [docs/yahoo-api-application.md](docs/yahoo-api-application.md); the integration is built + tested against spec-accurate fixtures and flips on with one env change). See [docs/design.md](docs/design.md) and [docs/plans/](docs/plans/).
 
 ## Architecture (target)
 
