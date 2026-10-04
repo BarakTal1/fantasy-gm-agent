@@ -126,7 +126,7 @@
 .lp-footer { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
   max-width: 1120px; width: 100%; margin-inline: auto;
   padding: 28px clamp(16px, 5vw, 48px); border-top: 1px solid var(--border); }
-.lp-footer-note { color: var(--muted); font-size: 13px; margin-left: auto; }
+.lp-footer-note { color: var(--muted); font-size: 13px; margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 
 /* ---------- Landing responsive ---------- */
 @media (max-width: 860px) {

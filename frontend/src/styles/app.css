@@ -556,5 +556,6 @@ a.brand:active { transform: scale(0.98); }
 
 .yahoo-attribution { display: flex; align-items: center; justify-content: center; gap: 8px;
   margin: 24px 0 16px; font-size: 12px; color: var(--muted); }
-/* White chip keeps the unmodified logo legible in dark mode. */
-.yahoo-logo { display: block; height: 56px; width: auto; background: #fff; border-radius: 6px; }
+/* Logo is shown unmodified; the white chip keeps it legible in dark mode. */
+.yahoo-logo { display: inline-block; vertical-align: middle; height: 44px; width: auto;
+  padding: 4px 8px; background: #fff; border-radius: 6px; }

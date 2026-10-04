@@ -33,7 +33,7 @@ const FEATURES = [
 const STEPS = [
   { n: "1", title: "Ask anything", body: "“Who should I start tonight?” — in plain language, like texting a sharp friend." },
   { n: "2", title: "Lightning digs in", body: "It pulls your roster, the wire, and the schedule, then reasons over your league's scoring." },
-  { n: "3", title: "Make the move", body: "Clear recommendations backed by the numbers — no spreadsheets required." },
+  { n: "3", title: "Make the move", body: "Recommendations backed by the numbers. It is read-only and never touches a roster." },
 ];
 
 export function LandingView({ theme, onToggle }: { theme: string; onToggle: () => void }) {
@@ -60,20 +60,19 @@ export function LandingView({ theme, onToggle }: { theme: string; onToggle: () =
 
       <section className="lp-hero">
         <div className="lp-hero-copy">
-          <span className="lp-eyebrow"><Zap size={13} fill="currentColor" /> Fantasy basketball, sharpened by AI</span>
+          <span className="lp-eyebrow"><Zap size={13} fill="currentColor" /> A personal project · NBA fantasy + AI</span>
           <h1 className="lp-title">Your fantasy GM, electrified.</h1>
           <p className="lp-sub">
-            Waiver-wire radar, trade analysis, and buy-low targets — grounded in your
-            league, delivered in plain language. Meet the assistant that actually reads
-            the box scores for you.
+            A personal, read-only assistant I built to help run my own Yahoo NBA fantasy
+            league: waiver-wire radar, trade analysis, and buy-low targets, in plain
+            language. This public demo runs on real NBA player data in a sample league.
           </p>
           <div className="lp-cta-row">
             <Link to="/app" className="lp-btn lp-btn-primary">
               Try the demo <ArrowRight size={17} />
             </Link>
-            <Link to="/login" className="lp-btn lp-btn-ghost">Sign in</Link>
           </div>
-          <p className="lp-note">No account needed — jump straight into a real-NBA demo league.</p>
+          <p className="lp-note">No account needed. Not a commercial product, and not affiliated with Yahoo.</p>
         </div>
 
         <div className="lp-hero-visual" aria-hidden="true">
@@ -99,8 +98,8 @@ export function LandingView({ theme, onToggle }: { theme: string; onToggle: () =
 
       <section ref={featuresRef} className={"lp-section lp-features reveal" + (featuresIn ? " in" : "")}>
         <div className="lp-section-head">
-          <h2>Everything a good GM does — in seconds</h2>
-          <p>Four tools, one conversation. Lightning handles the grind so you make the calls.</p>
+          <h2>What it does</h2>
+          <p>Four tools, one conversation. It recommends; you make the calls.</p>
         </div>
         <div className="lp-grid">
           {FEATURES.map((f) => (
@@ -130,13 +129,12 @@ export function LandingView({ theme, onToggle }: { theme: string; onToggle: () =
 
       <section ref={ctaRef} className={"lp-section lp-cta reveal" + (ctaIn ? " in" : "")}>
         <div className="lp-cta-inner">
-          <h2>Ready to run your team like a pro?</h2>
-          <p>Start with the demo league — no sign-up, no credit card.</p>
+          <h2>A personal project, not a product</h2>
+          <p>Built for my own league and shared as a portfolio piece. Try the demo league; no sign-up needed.</p>
           <div className="lp-cta-row">
             <Link to="/app" className="lp-btn lp-btn-primary">
-              Open Lightning <ArrowRight size={17} />
+              Try the demo <ArrowRight size={17} />
             </Link>
-            <Link to="/login" className="lp-btn lp-btn-ghost">Create an account</Link>
           </div>
         </div>
       </section>
@@ -150,7 +148,7 @@ export function LandingView({ theme, onToggle }: { theme: string; onToggle: () =
           <a href="https://sports.yahoo.com/fantasy/" target="_blank" rel="noopener noreferrer">
             <img className="yahoo-logo" src="/yahoo-fantasy-logo.png" alt="Yahoo Fantasy" />
           </a>
-          {" "}· Your fantasy GM, electrified.
+          {" "}· Personal project, not affiliated with Yahoo.
         </span>
       </footer>
     </div>
