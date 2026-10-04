@@ -147,7 +147,9 @@ export function LandingView({ theme, onToggle }: { theme: string; onToggle: () =
         </div>
         <span className="lp-footer-note">
           Fantasy data provided by{" "}
-          <a href="https://sports.yahoo.com/fantasy/" target="_blank" rel="noopener noreferrer">Yahoo Fantasy</a>
+          <a href="https://sports.yahoo.com/fantasy/" target="_blank" rel="noopener noreferrer">
+            <img className="yahoo-logo" src="/yahoo-fantasy-logo.png" alt="Yahoo Fantasy" />
+          </a>
           {" "}· Your fantasy GM, electrified.
         </span>
       </footer>

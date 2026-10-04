@@ -554,5 +554,7 @@ a.brand:active { transform: scale(0.98); }
   .empty .example:nth-child(4) { animation-delay: .30s; }
 }
 
-.yahoo-attribution { margin: 24px 0 16px; text-align: center; font-size: 12px; color: var(--muted); }
-.yahoo-attribution a { color: inherit; text-decoration: underline; }
+.yahoo-attribution { display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 24px 0 16px; font-size: 12px; color: var(--muted); }
+/* White chip keeps the unmodified logo legible in dark mode. */
+.yahoo-logo { display: block; height: 56px; width: auto; background: #fff; border-radius: 6px; }

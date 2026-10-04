@@ -24,7 +24,7 @@ Source: Yahoo's developer pages (`/developer/`, `/developer/docs/`, `/developer/
 - Added the "Fantasy data provided by Yahoo Fantasy" attribution (in-app footer and landing footer).
 - Removed the "connect your Yahoo league soon" sign-up copy.
 
-Not done: the official Yahoo Fantasy logo (download it from Yahoo's branding guidelines and add it unmodified).
+Logo: added unmodified at `frontend/public/yahoo-fantasy-logo.png` (white background chip in dark mode, never inverted or recolored).
 
 ## Suggested resubmission (personal, single-league, small)
 
