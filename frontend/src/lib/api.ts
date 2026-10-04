@@ -80,6 +80,15 @@ async function authPost(path: string, body?: object) {
 export async function register(email: string, password: string) {
   return authPost("/auth/register", { email, password }) as Promise<AuthUser>;
 }
+export async function getAuthConfig() {
+  try {
+    const r = await fetch(`${API_BASE}/auth/config`, CREDS);
+    if (!r.ok) return { registration_open: false };
+    return (await r.json()) as { registration_open: boolean };
+  } catch {
+    return { registration_open: false };
+  }
+}
 export async function login(email: string, password: string) {
   return authPost("/auth/login", { email, password }) as Promise<AuthUser>;
 }

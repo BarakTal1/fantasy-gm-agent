@@ -359,3 +359,14 @@ def test_sync_yahoo_falls_back_when_not_connected(db):
     r = c.post("/settings/league/sync-yahoo")
     assert r.status_code == 409
     assert "connect" in r.json()["detail"].lower()
+
+
+def test_registration_closed_by_default(monkeypatch):
+    from fantasy_gm import api
+    from fantasy_gm.config import get_settings
+    monkeypatch.setenv("ALLOW_REGISTRATION", "false")
+    get_settings.cache_clear()
+    c = TestClient(api.app)
+    assert c.get("/auth/config").json() == {"registration_open": False}
+    r = c.post("/auth/register", json={"email": "n@x.com", "password": "pw"})
+    assert r.status_code == 403

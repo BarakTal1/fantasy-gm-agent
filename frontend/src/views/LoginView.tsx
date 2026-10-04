@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Zap, ArrowRight, Radar, Scale, TrendingUp } from "lucide-react";
 import { useAuth } from "../state/auth";
+import { getAuthConfig } from "../lib/api";
 import { ThemeToggle } from "../components/ThemeToggle";
 
 const PERKS = [
@@ -18,6 +19,11 @@ export function LoginView({ theme, onToggle }: { theme: string; onToggle: () => 
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [registrationOpen, setRegistrationOpen] = useState(false);
+
+  useEffect(() => {
+    getAuthConfig().then((c) => setRegistrationOpen(c.registration_open));
+  }, []);
 
   // Already signed in — nothing to do here.
   if (ready && user) return <Navigate to="/app" replace />;
@@ -87,10 +93,14 @@ export function LoginView({ theme, onToggle }: { theme: string; onToggle: () => 
               {busy ? "…" : mode === "login" ? "Sign in" : "Create account"}
             </button>
           </form>
-          <button className="auth-switch"
-                  onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(null); }}>
-            {mode === "login" ? "New here? Create an account" : "Already have an account? Sign in"}
-          </button>
+          {registrationOpen ? (
+            <button className="auth-switch"
+                    onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(null); }}>
+              {mode === "login" ? "New here? Create an account" : "Already have an account? Sign in"}
+            </button>
+          ) : (
+            <p className="modal-sub">Sign-up is closed: this is a personal project. The demo needs no account.</p>
+          )}
         </div>
 
         <Link to="/app" className="auth-skip">

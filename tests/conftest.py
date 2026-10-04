@@ -9,6 +9,15 @@ from fantasy_gm.config import get_settings
 from scripts.run_migrations import run as run_migrations
 
 
+@pytest.fixture(autouse=True)
+def _open_registration(monkeypatch):
+    # Registration is closed by default; most tests need to create accounts.
+    monkeypatch.setenv("ALLOW_REGISTRATION", "true")
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
+
+
 @pytest.fixture
 def db(monkeypatch):
     test_url = get_settings().test_database_url

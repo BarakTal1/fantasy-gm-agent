@@ -25,6 +25,11 @@ class Settings(BaseSettings):
 
     anthropic_api_key: str = ""
 
+    # Public sign-up is closed by default (personal project; Yahoo access is
+    # personal/single-league). Set ALLOW_REGISTRATION=true briefly to create your
+    # own account, then turn it off again.
+    allow_registration: bool = False
+
     # Signs the JWT session cookie. Override with SECRET_KEY in production
     # (use a long random value — this dev default is only for local runs).
     secret_key: str = "dev-secret-change-me-please-set-SECRET_KEY-in-prod"

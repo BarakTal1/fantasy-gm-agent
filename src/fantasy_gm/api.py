@@ -175,8 +175,15 @@ def _league_for(request: Request) -> LeagueSettings:
     return _load_league()
 
 
+@app.get("/auth/config")
+def auth_config() -> dict:
+    return {"registration_open": get_settings().allow_registration}
+
+
 @app.post("/auth/register")
 def register(creds: Credentials, request: Request, response: Response) -> dict:
+    if not get_settings().allow_registration:
+        raise HTTPException(status_code=403, detail="Registration is closed.")
     if not creds.email or not creds.password:
         raise HTTPException(status_code=400, detail="Email and password required.")
     if users.get_user_by_email(creds.email):
