@@ -51,9 +51,8 @@ export function Header({ theme, onToggle }: { theme: string; onToggle: () => voi
       {league && <span className="league">{league}</span>}
       <div className="header-right">
         <ThemeToggle theme={theme} onToggle={onToggle} />
-        {ready && !user && (
-          <Link className="signin-btn" to="/login">Sign in</Link>
-        )}
+        {/* No public sign-in link: this is a single-user personal project. /login
+            still works by direct URL for the owner. */}
         {ready && user && (
           <div className="account" ref={accountRef}>
             <button className="account-btn" aria-haspopup="menu" aria-expanded={menuOpen}

@@ -65,10 +65,10 @@ describe("SettingsView", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(/connected/i);
   });
 
-  it("prompts to sign in when logged out", async () => {
+  it("explains settings are owner-only when logged out", async () => {
     vi.spyOn(api, "getMe").mockResolvedValue(null);
     renderSettings();
-    expect(await screen.findByText(/sign in to set up your league/i)).toBeInTheDocument();
+    expect(await screen.findByText(/league setup is available to the project owner only/i)).toBeInTheDocument();
   });
 
   it("switches to point weights for a points-format config", async () => {

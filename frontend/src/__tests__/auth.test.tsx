@@ -21,11 +21,11 @@ beforeEach(() => {
 });
 
 describe("auth", () => {
-  it("Header shows a Sign in link to /login when logged out", async () => {
+  it("Header shows no Sign in link when logged out (single-user project)", async () => {
     vi.spyOn(api, "getMe").mockResolvedValue(null);
     renderWith(<Header theme="light" onToggle={() => {}} />);
-    const link = await screen.findByRole("link", { name: /sign in/i });
-    expect(link).toHaveAttribute("href", "/login");
+    await screen.findByText("Demo · 9-cat", { exact: false }).catch(() => null);
+    expect(screen.queryByRole("link", { name: /sign in/i })).toBeNull();
   });
 
   it("logs in through the login page", async () => {

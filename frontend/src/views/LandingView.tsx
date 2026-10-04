@@ -53,7 +53,6 @@ export function LandingView({ theme, onToggle }: { theme: string; onToggle: () =
         </div>
         <div className="lp-topbar-right">
           <ThemeToggle theme={theme} onToggle={onToggle} />
-          <Link to="/login" className="lp-nav-link">Sign in</Link>
           <Link to="/app" className="signin-btn">Open app</Link>
         </div>
       </header>

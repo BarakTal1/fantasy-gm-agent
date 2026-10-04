@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Moon, Sun, Link2, RefreshCw, Check } from "lucide-react";
 import { useAuth } from "../state/auth";
 import {
@@ -103,7 +103,7 @@ export function SettingsView({ theme, onToggle }: { theme: string; onToggle: () 
           </div>
         ) : (
           <p className="settings-hint">
-            <Link to="/login" className="settings-signin-link">Sign in</Link> to save your settings.
+            Settings are only editable by the project owner. The demo runs on a sample league.
           </p>
         )}
       </section>
@@ -121,7 +121,7 @@ export function SettingsView({ theme, onToggle }: { theme: string; onToggle: () 
       <section className="settings-card">
         <h2>League settings</h2>
         {!user ? (
-          <p className="settings-hint">Sign in to set up your league.</p>
+          <p className="settings-hint">League setup is available to the project owner only.</p>
         ) : loadErr ? (
           <p className="auth-error" role="alert">Failed to load settings: {loadErr}</p>
         ) : !options ? (
