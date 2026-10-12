@@ -4,12 +4,14 @@ from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
 
+import psycopg
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
+from psycopg.rows import dict_row
 from pydantic import BaseModel
 
 from fantasy_gm import analytics, proposals, received_trades, trade, trades_history, users
@@ -30,10 +32,17 @@ _DEMO_DIR = Path(__file__).resolve().parent.parent.parent / "demo_data"
 
 _checkpointer = None  # set at startup in production; stays None under tests
 
+# On Vercel (serverless) no long-lived process exists. Skip the lifespan hook and
+# open a short-lived checkpointer connection for each chat request instead.
+_SERVERLESS = bool(os.getenv("VERCEL"))
+
 
 @asynccontextmanager
 async def lifespan(_app):
     global _checkpointer
+    if _SERVERLESS:
+        yield
+        return
     cm = PostgresSaver.from_conn_string(get_settings().database_url)
     _checkpointer = cm.__enter__()
     _checkpointer.setup()
@@ -564,11 +573,24 @@ def trade_analyze(req: TradeRequest, request: Request) -> dict:
 @app.post("/chat")
 def chat(req: ChatRequest, request: Request) -> StreamingResponse:
     _guard(request)
+    conn = None
+    checkpointer = _checkpointer
+    if checkpointer is None and _SERVERLESS:
+        conn = psycopg.connect(get_settings().database_url, autocommit=True,
+                               prepare_threshold=None, row_factory=dict_row)
+        checkpointer = PostgresSaver(conn)
     agent = build_agent(league=_league_for(request), league_key=LEAGUE_KEY,
                         my_team_key=MY_TEAM_KEY, model=_make_model(),
-                        checkpointer=_checkpointer)
+                        checkpointer=checkpointer)
 
     def gen():
+        try:
+            yield from _stream(agent, req)
+        finally:
+            if conn is not None:
+                conn.close()
+
+    def _stream(agent, req):
         config = {"configurable": {"thread_id": req.conversation_id}}
         emitted_token = False
         last_id = None

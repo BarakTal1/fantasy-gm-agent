@@ -1,0 +1,11 @@
+frontend/
+docs/
+plans/
+tests/
+evals/
+scripts/
+db/
+Dockerfile
+docker-compose.yml
+Procfile
+start.sh
